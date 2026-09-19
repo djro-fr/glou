@@ -1,4 +1,4 @@
-INSERT INTO quartiers (numero, nom) VALUES
+INSERT INTO district (number_d, name_d) VALUES
 (1, 'Capitole / Arnaud Bernard / Carmes'),
 (2, 'Amidonniers / Compans-Caffarelli / Brouardel'),
 (3, 'Les Chalets / Bayard / Belfort / Saint-Aubin / Dupuy'),

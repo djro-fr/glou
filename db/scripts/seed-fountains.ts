@@ -45,7 +45,7 @@ for (const row of rows) {
     continue; // passe à la ligne suivante sans essayer d'insérer
   }
   await client.query(
-    `INSERT INTO fontaines (id, localisation, type_font, adresse, commune, statut, latitude, longitude, quartier_numero)
+    `INSERT INTO fountain (id, location_f, type_f, address_f, city, status_f, latitude, longitude, district_number)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      ON CONFLICT (id) DO NOTHING`,
     [

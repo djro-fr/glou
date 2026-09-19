@@ -1,21 +1,21 @@
-CREATE TABLE quartiers (  
-  numero      INTEGER PRIMARY KEY,   -- numéro de quartier (recoupé avec "Quartiers de proximité")
-  nom         VARCHAR(255) NOT NULL
+CREATE TABLE district (  
+  number_d       INTEGER PRIMARY KEY,   
+  name_d         VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE fontaines (
+CREATE TABLE fountain (
   id                INTEGER PRIMARY KEY,
-  localisation      VARCHAR(255),
-  type_font         VARCHAR(50),
-  adresse           VARCHAR(255),
-  commune           VARCHAR(20),
-  statut            VARCHAR(50),
+  location_f        VARCHAR(255),
+  type_f            VARCHAR(50),
+  address_f         VARCHAR(255),
+  city              VARCHAR(20),
+  status_f          VARCHAR(50),
   latitude          DOUBLE PRECISION NOT NULL,
   longitude         DOUBLE PRECISION NOT NULL,
   created_at        TIMESTAMP DEFAULT NOW(),
-  quartier_numero   INTEGER REFERENCES quartiers(numero)
+  district_number   INTEGER REFERENCES district(number_d)
 );
 
-CREATE INDEX idx_fontaines_quartier ON fontaines(quartier_numero);
-CREATE INDEX idx_fontaines_type ON fontaines(type_font);
-CREATE INDEX idx_fontaines_statut ON fontaines(statut);
+CREATE INDEX idx_fountain_district ON fountain(district_number);
+CREATE INDEX idx_fountain_type_f ON fountain(type_f);
+CREATE INDEX idx_fountain_status ON fountain(status_f);

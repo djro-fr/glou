@@ -1,78 +1,98 @@
-# GLOU Toulouse - Fontaines d'eau potable à Toulouse
+# GLOU Toulouse - Drinking Water Fountains in Toulouse
 
-Carte interactive recensant les ~480 fontaines d'eau potable à Toulouse, à partir des données ouvertes de Toulouse Métropole. Application incluant une page de présentation du projet et un formulaire de contact.
+Interactive map listing the ~480 public drinking water fountains in Toulouse, built from Toulouse Métropole's open data. The app also includes a project presentation page and a contact form.
 
-## Stack technique
+## Tech Stack
 
-- **Frontend** : React + TypeScript + Open Street Map & MapLibre GL JS + SCSS
-- **Fond de carte** : style Positron via openmaptiles.geo.data.gouv.fr (Etalab)
-- **Backend** : Node.js + Express
-- **Base de données** : PostgreSQL
-- **CI/CD** : GitHub Actions + déploiement Docker Compose sur VPS
-- **Routing** : React Router
-- **Formulaire de contact** : Nodemailer (backend)
+- **Frontend**: React + TypeScript + OpenStreetMap & MapLibre GL JS + SCSS
+- **Basemap**: Positron style via openmaptiles.geo.data.gouv.fr (Etalab)
+- **Backend**: Node.js + Express
+- **Database**: PostgreSQL
+- **CI/CD**: GitHub Actions + Docker Compose deployment on a VPS
+- **Routing**: React Router
+- **Contact form**: Nodemailer (backend)
 
-## Maquettes
+## Mockups
 
 - [`Wireframe`](https://www.figma.com/proto/xSuUN7Zc4uRUs2I9mdYv34/GLOU---Design?node-id=1-52&viewport=782%2C466%2C0.35&t=NYSrWPvKp3Uyk6Z9-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=1%3A52&show-proto-sidebar=1&page-id=0%3A1)
 - [`Mockup`](https://www.figma.com/proto/xSuUN7Zc4uRUs2I9mdYv34/GLOU---Design?node-id=9-481&viewport=885%2C766%2C0.24&t=HjIiaVk6J6dD3emi-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=9%3A481&page-id=9%3A469)
 
 ## Documentation
 
-Le cahier des charges complet (contexte, User Stories, modélisation de données, architecture, endpoints API, critères de "fini") est disponible dans [`docs/CAHIER_DES_CHARGES.md`](docs/CAHIER_DES_CHARGES.md).
+The full spec (context, user stories, data model, architecture, API endpoints, definition of done) is available in [`docs/SPECIFICATIONS.md`](docs/SPECIFICATIONS.md).
 
 ## Design tokens
 
-Les tokens sont définis dans [`design-system/tokens.json`](design-system/tokens.json) (format Tokens Studio / DTCG)
-et transformés en variables CSS via Style Dictionary.
+Tokens are defined in [`design-system/tokens.json`](design-system/tokens.json) (Tokens Studio / DTCG format)
+and transformed into CSS variables via Style Dictionary.
 
-`npm run build-tokens` → génère build/css/variables.css (ne pas éditer directement)
+`npm run build-tokens` → generates `build/css/variables.css` (do not edit directly)
 
-## Démo en ligne
+## Live demo
 
-*À venir une fois le déploiement effectué.*
+*Coming soon, once deployed.*
 
-## Installation & lancement en local
+## Local setup
 
-### Prérequis
+### Prerequisites
 
-- Node.js (version à préciser une fois le projet initialisé)
+- Node.js (version to be specified once the project is initialized)
 - PostgreSQL
-- Docker & Docker Compose (optionnel, pour lancer l'environnement complet)
+- Docker & Docker Compose (optional, to run the full environment)
 
-### Étapes
+### Steps
 
 ```bash
-# Cloner le repo
-git clone <url-du-repo>
-cd <nom-du-repo>
+# Clone the repo
+git clone <repo-url>
+cd <repo-name>
 
-# Installer les dépendances (frontend et backend)
+# Install dependencies (frontend and backend)
 npm install
 
-# Configurer les variables d'environnement
+# Set up environment variables
 cp .env.example .env
-# puis éditer .env avec les identifiants PostgreSQL
+# then edit .env with your PostgreSQL credentials
 
-# Lancer l'application (détail des scripts à préciser selon la structure finale)
+# Run the app (scripts to be detailed once the final structure is in place)
 npm run dev
 ```
 
-## Structure du projet
+## Project structure
 
 ```text
 .
 ├── docs/
-│   └── CAHIER_DES_CHARGES.md
-├── frontend/
+│   └── SPECIFICATIONS.md
+├── db/
+│   ├── data/        # CSV source (not versioned)
+│   ├── init/        # schema + districts seed (auto-run on first container start)
+│   └── scripts/     # seed-fountains.ts
 ├── backend/
 └── README.md
 ```
 
-## Source des données
+## Database
 
-[data.toulouse-metropole.fr — Fontaines à boire](https://data.toulouse-metropole.fr/explore/dataset/fontaines-a-boire/) (licence ODbL)
+### Seeding the fountains
 
-## Licence
+The script `db/scripts/seed-fountains.ts` reads the "fontaines à boire" dataset CSV and inserts the 481 rows into the `fountain` table.
 
-*À définir.*
+**Does not run automatically** (unlike the schema and the districts seed), it must be run manually after every `docker compose up` on an empty volume:
+
+```bash
+npx tsx db/scripts/seed-fountains.ts
+```
+
+The source CSV file (`db/data/fontaines-a-boire.csv`) must be present beforehand, downloadable from
+[data.toulouse-metropole.fr](https://data.toulouse-metropole.fr/explore/dataset/fontaines-a-boire/).
+
+The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an already-seeded database won't insert duplicates.
+
+## Data source
+
+[data.toulouse-metropole.fr, Fontaines à boire](https://data.toulouse-metropole.fr/explore/dataset/fontaines-a-boire/) (ODbL license)
+
+## Last update
+
+September 19, 2026
