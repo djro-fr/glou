@@ -96,10 +96,12 @@ _Coming soon, once deployed._
 ├── docs/
 │   └── SPECIFICATIONS.md
 ├── db/
-│   ├── data/        # CSV source (not versioned)
+│   ├── data/        # CSV sources, versioned
 │   ├── init/        # schema + districts seed (auto-run on first container start)
-│   └── scripts/     # seed-fountains.ts
+│   └── scripts/     # seeds fountains
 ├── backend/
+│   ├── config/      # env, database and transporter (smtp mail) configuration
+│   └── src/         # Express server app 
 └── README.md
 ```
 

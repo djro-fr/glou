@@ -66,7 +66,7 @@
   - Filters remain combinable with each other (US8)
 - **Fountain details (US7)**, shown on marker click: ID, type, city, district, location, address, status
 - About page: project presentation (context, objective, tech stack) and short bio
-- Contact page: form (name, email, message) sent via a dedicated backend (Nodemailer)
+- Contact page: form (name, email, subject, message) sent via a dedicated backend (Nodemailer)
 - Server-side field validation (valid email, required fields)
 - Basic anti-spam measure planned (simple honeypot)
 - Client-side routing added (React Router) to navigate between the map, About and Contact
@@ -131,7 +131,7 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 - Design tokens pipeline: Tokens Studio (Figma) → DTCG format (tokens.json) → Style Dictionary (@tokens-studio/sd-transforms) → CSS custom properties (variables.css)
 - Routing: React Router
-- Contact: `POST /contact` route on the Express backend, sent via Nodemailer (SMTP provider TBD, Gmail, OVH, or another option depending on what's already available on the sylys.dev domain)
+- Contact: `POST /contact` route on the Express backend, sent via Nodemailer (SMTP provider TBD, Gmail, OVH, or another option depending on what's already available on your domain)
 - Server-side field validation (valid email, required fields)
 - Basic anti-spam measure planned (simple honeypot)
 - V1 state management: local React state (`useState`), simple and sufficient for the current scope. Migration to Redux Toolkit planned for V2 (learning objective)
@@ -146,7 +146,7 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 | GET | `/fountains/:id` | Fountain detail |
 | GET | `/fountains?city=X&district=Y&type=Z&status=W` | Filtered fountains |
 | GET | `/districts` | List of districts (id + name) |
-| POST | `/contact` | Send the contact form (name, email, message) |
+| POST | `/contact` | Send the contact form (name, email, subject, message) |
 
 ---
 
@@ -178,7 +178,7 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 - [ ] Functional map displaying all ~480 fountains with clustering
 - [ ] Filters (city, district, type, status) working, with bidirectional city/district dependency
 - [ ] Fountain details accessible on click
-- [ ] Functional backend API connected to PostgreSQL
+- [x] Functional backend API connected to PostgreSQL
 - [ ] Passing CI pipeline (lint, build)
 - [ ] Live deployment on the VPS, application accessible online
 - [ ] Working contact form (submission + validation + visual feedback to the user)
@@ -195,4 +195,4 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 ## Last update
 
-September 19, 2026
+September 20, 2026

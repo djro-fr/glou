@@ -1,11 +1,5 @@
 
-import { config } from 'dotenv';
-import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-
-const fileURL = new URL("../../.env", import.meta.url);
-const filePath = fileURLToPath(fileURL)
-config({path:filePath});
 
 export const client = new pg.Client({
   user: process.env.POSTGRES_USER,
