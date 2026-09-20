@@ -30,32 +30,64 @@ and transformed into CSS variables via Style Dictionary.
 
 ## Live demo
 
-*Coming soon, once deployed.*
+_Coming soon, once deployed._
 
 ## Local setup
 
 ### Prerequisites
 
-- Node.js v24.16.0
+- Node.js v24.16.0+
 - Docker & Docker Compose
+- PostgreSQL running (via Docker Compose or locally on port 5433)
 
 ### Steps
 
-```bash
-# Clone the repo
-git clone <repo-url>
-cd <repo-name>
+1. **Clone the repo and install dependencies**
 
-# Install dependencies (frontend and backend)
-npm install
+   ```bash
+      git clone <repo-url>
+      cd glou
 
-# Set up environment variables
-cp .env.example .env
-# then edit .env with your PostgreSQL credentials
+      # Install root dependencies (tsx for running scripts)
+      npm install
 
-# Run the app (scripts to be detailed once the final structure is in place)
-npm run dev
-```
+      # Install backend dependencies
+      cd backend
+      npm install
+      cd ..
+
+      # Install db script dependencies
+      cd db
+      npm install
+      cd ..
+   ```
+
+2. Set up environment variables
+
+   ```bash
+      cp .env.example .env
+      # Edit .env with your PostgreSQL credentials
+   ```
+
+3. **Start PostgreSQL** (if using Docker Compose)
+
+   ```bash
+      docker compose up -d
+   ```
+
+   Wait for the database to be ready (schema and districts are auto-seeded).
+
+4. **Seed the fountains** (one-time after first `docker compose up`)
+
+   ```bash
+      npx tsx db/scripts/seed-fountains.ts
+   ```
+
+### Notes
+
+- The fountains CSV (`db/data/fontaines-a-boire.csv`) has been downloaded separately from [data.toulouse-metropole.fr](https://data.toulouse-metropole.fr/explore/dataset/fontaines-a-boire/) and placed in `db/data/`
+- Database schema and districts are auto-seeded on container start; fountains seed must be run manually
+- The seed script is idempotent (safe to re-run)
 
 ## Project structure
 
@@ -94,4 +126,4 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 
 ## Last update
 
-September 19, 2026
+September 20, 2026
