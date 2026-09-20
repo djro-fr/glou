@@ -4,7 +4,8 @@
     "dotenv": "^18.0.1",
     "express": "^5.2.1",
     "nodemailer": "^10.0.10",
-    "pg": "^8.23.0"
+    "pg": "^8.23.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
