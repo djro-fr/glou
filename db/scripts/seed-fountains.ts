@@ -35,6 +35,8 @@ const client = new pg.Client({
   port: 5433,
 });
 
+let conflictCount = 0;
+
 await client.connect();  
 for (const row of rows) {
   const geoPoint = row['Geo Point'];
@@ -44,7 +46,7 @@ for (const row of rows) {
     console.warn('Coordonnées invalides pour la ligne id', row.id_fontaines_a_boire);
     continue; // passe à la ligne suivante sans essayer d'insérer
   }
-  await client.query(
+  const result = await client.query(
     `INSERT INTO fountain (id, location_f, type_f, address_f, city, status_f, latitude, longitude, district_number)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      ON CONFLICT (id) DO NOTHING`,
@@ -60,7 +62,11 @@ for (const row of rows) {
       quartierNumero
     ]
   );
+  if (result.rowCount === 0) {
+    conflictCount++;
+  }
 }
+console.log(`Seed terminé. ${conflictCount} conflits détectés.`);
 await client.end();
 
 

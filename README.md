@@ -36,9 +36,8 @@ and transformed into CSS variables via Style Dictionary.
 
 ### Prerequisites
 
-- Node.js (version to be specified once the project is initialized)
-- PostgreSQL
-- Docker & Docker Compose (optional, to run the full environment)
+- Node.js v24.16.0
+- Docker & Docker Compose
 
 ### Steps
 
