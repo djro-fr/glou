@@ -129,7 +129,7 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 | CD | Deployment on a dedicated VPS |
 | Containerization | Docker Compose (frontend, backend, PostgreSQL) |
 
-- Design tokens pipeline: Tokens Studio (Figma) → DTCG format (tokens.json) → Style Dictionary (@tokens-studio/sd-transforms) → CSS custom properties (variables.css)
+- Design tokens pipeline: Tokens Studio (Figma) → DTCG format (tokens.json) → Style Dictionary (@tokens-studio/sd-transforms) → CSS custom properties (tokens.css)
 - Routing: React Router
 - Contact: `POST /contact` route on the Express backend, sent via Nodemailer (SMTP provider TBD, Gmail, OVH, or another option depending on what's already available on your domain)
 - Basic anti-spam measure planned (simple honeypot)

@@ -26,7 +26,7 @@ The full spec (context, user stories, data model, architecture, API endpoints, d
 Tokens are defined in [`design-system/tokens.json`](design-system/tokens.json) (Tokens Studio / DTCG format)
 and transformed into CSS variables via Style Dictionary.
 
-`npm run build-tokens` → generates `build/css/variables.css` (do not edit directly)
+`npm run build-tokens` → generates `build/css/tokens.css` (do not edit directly)
 
 ## Live demo
 

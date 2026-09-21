@@ -2,7 +2,7 @@ function FountainMap() {
 
   return (
     <>
-      <p>Map</p>     
+      <h1>Map</h1>     
       <p>bonjour</p>
     </>
   )

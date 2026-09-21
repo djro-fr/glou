@@ -1,5 +1,7 @@
 import { Outlet } from "react-router"
 
+import './Layout.scss'
+
 import Nav from "./Nav"
 
 function Layout() {

@@ -1,0 +1,57 @@
+@use '../styles/tokens.scss' as *;
+
+nav#main-nav{
+  z-index: 10;
+  position: absolute;
+  align-content: center;
+  bottom: 0;
+  width: 100%;
+  border-top: 2px solid $neutral-300;
+  height: 75px;  
+  font-family: $family-text;
+  background-color: $neutral-0;
+  box-shadow: $shd-nav;
+  ul{
+    margin: 0 auto;
+    padding: 0 $space-lg;
+    display: flex;
+    justify-content: space-between;
+    max-width: 20rem;
+    list-style: none;
+    li{
+      a{      
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;        
+        color:$primary-600; 
+        font-size: $ft-siz-2x-small;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        text-decoration: none;
+        svg{
+          max-width: 2rem;
+          max-height: 2rem;
+          color:$primary-600;          
+        }
+        p{
+          margin: 0;
+          margin-top: 7px;
+        }
+        &.active{
+          color:$primary-900;
+          svg{
+            color:$primary-900;
+          }        
+        }        
+      }      
+      &:nth-child(2){
+        border-left: 1px $neutral-300 solid;
+        padding: 0 1.4rem;
+        border-right: 1px $neutral-300 solid;
+        
+      }
+    }
+  }  
+}

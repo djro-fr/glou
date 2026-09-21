@@ -1,15 +1,36 @@
 import { NavLink } from "react-router"
+import IconSprite from "../components/IconSprite"
+
+import './Nav.scss'
 
 function Nav() {
 
   return (
-    <nav>
-      <ul>
-        <li><NavLink to="/">Accueil</NavLink></li>
-        <li><NavLink to="/contact">Contact</NavLink></li>
-        <li><NavLink to="/about">À Propos</NavLink></li>
-      </ul>
-    </nav>
+    <>
+      <IconSprite />
+      <nav id='main-nav'>
+        <ul>
+          <li>
+            <NavLink to="/">
+              <svg><use href="#MapSVG" /></svg>
+              <p>Accueil</p>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/contact">
+              <svg><use href="#ContactSVG" /></svg>
+              <p>Contact</p>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/about">
+              <svg><use href="#AboutSVG" /></svg>
+              <p>À Propos</p>
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
+    </>
   )
 }
 
