@@ -8,6 +8,13 @@ export const client = new pg.Client({
   host: '127.0.0.1',
   port: 5433,
 });
-
-await client.connect();
-console.log('PostgreSQL connected');
+client.on('error', (err) => {
+  console.error('Erreur de connexion PostgreSQL :', err);
+});
+try {
+  await client.connect();
+  console.log('PostgreSQL connected');
+} catch (err) {
+  console.error('Base de données inaccessible :', err);
+  process.exit(1);  
+}

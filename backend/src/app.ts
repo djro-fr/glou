@@ -1,10 +1,13 @@
 import '../config/env.ts'
+import z from 'zod';
+z.config(z.locales.fr());
 
 import express, { type Express } from 'express';
 
 import { getAllFountainsController,getFountainByIdController } from './Controller/fountainController.ts';
 import { getAllDistrictsController }from './Controller/districtController.ts'
 import { sendContactEMailController } from './Controller/contactController.ts';
+import { errorHandler } from './Middleware/errorHandler.ts';
 
 const app: Express = express();
 app.disable('x-powered-by');
@@ -18,6 +21,9 @@ app.get('/districts', getAllDistrictsController);
 
 app.use(express.json());
 app.post('/contact', sendContactEMailController);
+
+app.use(errorHandler);
+
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });

@@ -6,3 +6,10 @@ export const contactSchema = z.object({
   subject: z.string().min(5),
   message: z.string().min(10)
 });
+
+export const fieldLabels: Record<string, string> = {
+  name: 'Nom',
+  email: 'E-mail',
+  subject: 'Sujet',
+  message: 'Message',
+};

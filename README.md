@@ -101,7 +101,12 @@ _Coming soon, once deployed._
 │   └── scripts/     # seeds fountains
 ├── backend/
 │   ├── config/      # env, database and transporter (smtp mail) configuration
-│   └── src/         # Express server app 
+│   └── src/
+│       ├── Controller/   # HTTP request handling
+│       ├── Service/      # Business logic
+│       ├── Repository/   # Data access (PostgreSQL, SMTP)
+│       ├── DTO/          # Zod validation schemas
+│       └── Middleware/   # Global error handling
 └── README.md
 ```
 
@@ -128,4 +133,4 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 
 ## Last update
 
-September 20, 2026
+September 21, 2026

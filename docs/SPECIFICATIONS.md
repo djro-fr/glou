@@ -132,9 +132,13 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 - Design tokens pipeline: Tokens Studio (Figma) → DTCG format (tokens.json) → Style Dictionary (@tokens-studio/sd-transforms) → CSS custom properties (variables.css)
 - Routing: React Router
 - Contact: `POST /contact` route on the Express backend, sent via Nodemailer (SMTP provider TBD, Gmail, OVH, or another option depending on what's already available on your domain)
-- Server-side field validation (valid email, required fields)
 - Basic anti-spam measure planned (simple honeypot)
 - V1 state management: local React state (`useState`), simple and sufficient for the current scope. Migration to Redux Toolkit planned for V2 (learning objective)
+
+### Error handling & validation
+
+- Backend input validation uses Zod (typed schemas, localized error messages).
+- A global Express error-handling middleware and dedicated PostgreSQL connection resilience (startup and runtime failures) ensure the API stays available and returns clear, structured error responses.
 
 ---
 
