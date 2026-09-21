@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tokens-studio/sd-transforms": "^2.0.3",
+    "maplibre-gl": "^6.10.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router": "^8.4.0",
