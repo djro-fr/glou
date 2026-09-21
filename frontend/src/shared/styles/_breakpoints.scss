@@ -1,0 +1,35 @@
+@use 'sass:map';
+
+$breakpoints: (
+  xs: 480px,
+  sm: 768px,
+  md: 1024px,
+  lg: 1280px,
+  xl: 1920px,
+);
+
+@function get-bp($key) {
+  @if not map.has-key($breakpoints, $key) {
+    @warn "Breakpoint inconnu : #{$key}";
+    @return null;
+  }
+  @return map.get($breakpoints, $key);
+}
+
+@mixin bp($min: null, $max: null) {
+  @if $min and $max {
+    @media (min-width: #{get-bp($min)}) and (max-width: #{get-bp($max) - 1px}) {
+      @content;
+    }
+  } @else if $min {
+    @media (min-width: #{get-bp($min)}) {
+      @content;
+    }
+  } @else if $max {
+    @media (max-width: #{get-bp($max) - 1px}) {
+      @content;
+    }
+  } @else {
+    @warn "bp() attend au moins un paramètre $min ou $max";
+  }
+}

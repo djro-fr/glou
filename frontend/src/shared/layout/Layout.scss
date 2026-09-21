@@ -1,11 +1,20 @@
 @use '../styles/tokens.scss' as *;
 
+@use '../styles/breakpoints' as bp;
+
 main{
-  max-width: 20rem;
+  max-width: 36rem;
+  width: 100%;
   padding: 0;
   margin: 0 auto;
   padding-top: 1rem;
+  padding-bottom: 8rem;
   font-family: $family-text;
+  div.img-center{
+    width: 100%;
+    text-align: center;
+    padding-bottom: 1rem;
+  }
   h1, h2, h3{
     padding: 0 $space-lg;
     line-height: 1.1;    
@@ -18,11 +27,27 @@ main{
   }  
   h2{    
     font-size: $ft-siz-2x-large;
+    padding-top: 2rem;
     padding-bottom: .5rem;
   }  
   h3{    
     font-size: $ft-siz-x-large;
     padding-bottom: .5rem;
+  }  
+  @include bp.bp($max: md) {
+    h1{    
+      font-size: $ft-siz-3x-large-mob;
+      padding-bottom: .5rem;
+    }  
+    h2{    
+      font-size: $ft-siz-2x-large-mob;
+      padding-top: 1rem;
+      padding-bottom: .5rem;
+    }  
+    h3{    
+      font-size: $ft-siz-x-large-mob;
+      padding-bottom: .5rem;
+    }    
   }
   p, ul{
     padding: 0 $space-lg 1rem;    
@@ -33,6 +58,13 @@ main{
     a{
       color: $primary-600;
       font-weight: 500;
+      text-underline-offset: .2rem;
+      &:hover{
+        text-decoration: none;
+      }
+    }
+    strong{
+      font-weight: 500;      
     }
   }
 }
