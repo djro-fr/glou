@@ -5,6 +5,10 @@ import { sendContactEMailService } from '../Service/contactService.ts';
 import { type Request, type Response } from 'express';
 
 export async function sendContactEMailController(req: Request, res: Response) {
+  if (req.body.website) {
+    res.status(200).json({message:"Thanks"});
+    return;
+  }
   let data;
   try {
     data = contactSchema.parse(req.body);
