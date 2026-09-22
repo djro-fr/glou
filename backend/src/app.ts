@@ -3,6 +3,7 @@ import z from 'zod';
 z.config(z.locales.fr());
 
 import express, { type Express } from 'express';
+import cors from 'cors';
 
 import { getAllFountainsController,getFountainByIdController } from './Controller/fountainController.ts';
 import { getAllDistrictsController }from './Controller/districtController.ts'
@@ -10,8 +11,13 @@ import { sendContactEMailController } from './Controller/contactController.ts';
 import { errorHandler } from './Middleware/errorHandler.ts';
 
 const app: Express = express();
+
 app.disable('x-powered-by');
 const port = 3000;
+
+app.use(cors({ 
+  origin: 'http://localhost:5173'
+}));
 
 app.get('/fountains', getAllFountainsController );
 

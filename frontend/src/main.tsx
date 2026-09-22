@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './shared/styles/reset.scss'
+import './shared/styles/tokens.css';
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

@@ -21,6 +21,17 @@ const sd = new StyleDictionary({
         },
       ],
     },
+    css: {                          
+      transformGroup: 'tokens-studio',
+      transforms: ["name/kebab"],
+      buildPath: 'src/shared/styles/',
+      files: [
+        {
+          destination: 'tokens.css',
+          format: 'css/variables',   //  :root { --xxx: yyy }
+        },
+      ],
+    },
   },
 });
 
