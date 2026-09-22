@@ -9,4 +9,5 @@ export interface Fountain {
   longitude: number;
   created_at: string;
   district_number: number;
+  name_d: string;
 }

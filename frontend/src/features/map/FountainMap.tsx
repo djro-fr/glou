@@ -1,19 +1,17 @@
 import { Map, setWorkerUrl, type GeoJSONSource, type MapMouseEvent, type MapGeoJSONFeature} from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+import { useEffect, useRef, useState } from "react";
+
 import type { Fountain } from "./types/fountain";
 
-import { useEffect, useRef } from "react";
 
 import "./FountainMap.scss";
 
-setWorkerUrl(workerUrl);
+import { getCSSVariable } from "../../shared/helpers/getCSSVariable";
+import FountainDetails from "./FountainDetails";
 
-function getCSSVariable(name: string): string {
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
-}
+setWorkerUrl(workerUrl);
 
 function fountainsToGeoJSON(fountains: Fountain[]) {
   return {
@@ -163,10 +161,35 @@ function setupClusterInteractions(mapInstance: Map) {
   });
 }
 
+function setupPinInteractions(
+  mapInstance: Map,
+  fountains: Fountain[],
+  onPinClick: (fountain: Fountain) => void
+) {
+  mapInstance.on('click', 'unclustered-point', (e) => {
+    if (!e.features?.length) return;
+
+    const clickedId = e.features[0].properties?.id;
+    const fountain = fountains.find((f) => f.id === clickedId);
+    console.log(fountain);
+
+    if (fountain) onPinClick(fountain);
+  });
+
+  mapInstance.on('mouseenter', 'unclustered-point', () => {
+    mapInstance.getCanvas().style.cursor = 'pointer';
+  });
+  mapInstance.on('mouseleave', 'unclustered-point', () => {
+    mapInstance.getCanvas().style.cursor = '';
+  });
+}
+
 function FountainMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
-
+  const fountainsRef = useRef<Fountain[]>([]);  
+  const [selectedFountain, setSelectedFountain] = useState<Fountain | null>(null);
+  
   useEffect(() => {
     if (!mapContainer.current) return;
 
@@ -182,12 +205,14 @@ function FountainMap() {
     fetch("http://localhost:3000/fountains")
       .then((res) => res.json())
       .then((fountains: Fountain[]) => {
+        fountainsRef.current = fountains;
         const geojson = fountainsToGeoJSON(fountains);
 
         mapInstance.on("load", () => {
           loadPinImages(mapInstance).then(() => {
             addFountainLayers(mapInstance, geojson);
             setupClusterInteractions(mapInstance);
+            setupPinInteractions(mapInstance, fountainsRef.current, setSelectedFountain);
           });
         });
       });
@@ -202,6 +227,9 @@ function FountainMap() {
     <>
       <h1>Trouvez une fontaine d’eau potable</h1>
       <div ref={mapContainer} id="map" />
+      {selectedFountain && (
+      <FountainDetails fountain={selectedFountain} onClose={() => setSelectedFountain(null)} />
+      ) }
     </>
   );
 }
