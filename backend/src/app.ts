@@ -16,8 +16,9 @@ app.disable('x-powered-by');
 const port = 3000;
 
 app.use(cors({ 
-  origin: 'http://localhost:5173'
+  origin: ['http://localhost:5173', 'http://localhost:4173']
 }));
+app.use(express.json());
 
 app.get('/fountains', getAllFountainsController );
 
@@ -25,7 +26,6 @@ app.get('/fountains/:id', getFountainByIdController );
 
 app.get('/districts', getAllDistrictsController);
 
-app.use(express.json());
 app.post('/contact', sendContactEMailController);
 
 app.use(errorHandler);
