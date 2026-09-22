@@ -1,17 +1,13 @@
-import { Map, setWorkerUrl, type GeoJSONSource, type MapMouseEvent, type MapGeoJSONFeature} from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
-import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+import type { Map, GeoJSONSource, MapMouseEvent, MapGeoJSONFeature } from "maplibre-gl";
+
 import { useEffect, useRef, useState } from "react";
 
 import type { Fountain } from "./types/fountain";
-
 
 import "./FountainMap.scss";
 
 import { getCSSVariable } from "../../shared/helpers/getCSSVariable";
 import FountainDetails from "./FountainDetails";
-
-setWorkerUrl(workerUrl);
 
 function fountainsToGeoJSON(fountains: Fountain[]) {
   return {
@@ -171,7 +167,6 @@ function setupPinInteractions(
 
     const clickedId = e.features[0].properties?.id;
     const fountain = fountains.find((f) => f.id === clickedId);
-    console.log(fountain);
 
     if (fountain) onPinClick(fountain);
   });
@@ -184,42 +179,73 @@ function setupPinInteractions(
   });
 }
 
+function handleMapLoad(
+  mapInstance: Map,
+  geojson: ReturnType<typeof fountainsToGeoJSON>,
+  fountains: Fountain[],
+  onPinClick: (fountain: Fountain) => void
+) {
+  loadPinImages(mapInstance).then(() => {
+    addFountainLayers(mapInstance, geojson);
+    setupClusterInteractions(mapInstance);
+    setupPinInteractions(mapInstance, fountains, onPinClick);
+  });
+}
+
+function initFountainLayer(
+  mapInstance: Map,
+  fountainsRef: React.RefObject<Fountain[]>,
+  onPinClick: (fountain: Fountain) => void
+) {
+  fetch("http://localhost:3000/fountains")
+    .then((res) => res.json())
+    .then((fountains: Fountain[]) => {
+      fountainsRef.current = fountains;
+      const geojson = fountainsToGeoJSON(fountains);
+      mapInstance.on("load", () => handleMapLoad(mapInstance, geojson, fountainsRef.current, onPinClick));
+    });
+}
+
 function FountainMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
-  const fountainsRef = useRef<Fountain[]>([]);  
+  const fountainsRef = useRef<Fountain[]>([]);
   const [selectedFountain, setSelectedFountain] = useState<Fountain | null>(null);
-  
+
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    const mapInstance = new Map({
-      container: mapContainer.current,
-      style: "https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json", // Positron style
-      center: [1.44, 43.6], // Toulouse
-      fadeDuration: 0, // no fade between zooms
-      zoom: 12,
-    });
-    map.current = mapInstance;
+    let mapInstance: Map | null = null;
+    let cancelled = false;
 
-    fetch("http://localhost:3000/fountains")
-      .then((res) => res.json())
-      .then((fountains: Fountain[]) => {
-        fountainsRef.current = fountains;
-        const geojson = fountainsToGeoJSON(fountains);
+    async function initMap() {
+      const [{ Map: MapLibreMap, setWorkerUrl }, workerUrlModule] = await Promise.all([
+        import("maplibre-gl"),
+        import("maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url"),
+      ]);
+      await import("maplibre-gl/dist/maplibre-gl.css");
 
-        mapInstance.on("load", () => {
-          loadPinImages(mapInstance).then(() => {
-            addFountainLayers(mapInstance, geojson);
-            setupClusterInteractions(mapInstance);
-            setupPinInteractions(mapInstance, fountainsRef.current, setSelectedFountain);
-          });
-        });
+      if (cancelled || !mapContainer.current) return;
+
+      setWorkerUrl(workerUrlModule.default);
+
+      mapInstance = new MapLibreMap({
+        container: mapContainer.current,
+        style: "https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json",
+        center: [1.44, 43.6],
+        fadeDuration: 0,
+        zoom: 12,
       });
+      map.current = mapInstance;
+
+      initFountainLayer(mapInstance, fountainsRef, setSelectedFountain);
+    }
+
+    initMap();
 
     return () => {
-      // cleanup when component unmounts
-      mapInstance.remove();
+      cancelled = true;
+      mapInstance?.remove();
     };
   }, []);
 
@@ -228,8 +254,8 @@ function FountainMap() {
       <h1>Trouvez une fontaine d’eau potable</h1>
       <div ref={mapContainer} id="map" />
       {selectedFountain && (
-      <FountainDetails fountain={selectedFountain} onClose={() => setSelectedFountain(null)} />
-      ) }
+        <FountainDetails fountain={selectedFountain} onClose={() => setSelectedFountain(null)} />
+      )}
     </>
   );
 }
