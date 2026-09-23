@@ -209,9 +209,10 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 - **User geolocation + proximity search**: Display fountains sorted by distance from user location. Enable address/street search (geocoding via API Adresse or Nominatim) to combine with geolocation. Requires PostGIS for spatial queries.
 
+- **Status updates**: Allow users to update fountain status (open/closed) with timestamp tracking
+
 ### Medium priority
 
-- **Status updates**: Allow users to update fountain status (open/closed) with timestamp tracking
 - **Fountain photos**: Add square photo storage and display in fountain details panel
 
 - Migrate state management (filters, fountain data) to Redux Toolkit (learning objective, skill-building)
