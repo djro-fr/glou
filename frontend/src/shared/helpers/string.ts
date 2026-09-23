@@ -21,3 +21,19 @@ export const orthograph = (str: string): string =>  str
   ;
 
 export const sanitizeString = (str: string): string => capitalizeList(orthograph(capitalize(str)));
+
+export function slugify(text: string | undefined): string {
+  if (typeof text !== 'string') {
+    return '';
+  }
+  return text
+    .normalize('NFD')                    // accents
+    .replace(/[\u0300-\u036f]/g, '')     // remove diacritics
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')        // remove special characters
+    .replace(/[\s_]+/g, '-')             // replace spaces/underscores by dash
+    .replace(/-+/g, '-')                 // no multiple dash
+    .replace(/^-/, '')  
+    .replace(/-$/, ''); 
+}

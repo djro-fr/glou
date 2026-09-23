@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./Dropdown.scss";
+import IconSprite from "./IconSprite";
+import { slugify } from "../helpers/string";
 
 export interface DropdownOption {
   id: string | number;
@@ -139,7 +141,7 @@ function Dropdown<T extends DropdownOption>({
   }
 
   return (
-    <div className="custom-dropdown">
+    <div className={`custom-dropdown ${slugify(label)}`}>
       {label && <label className="dropdown__label">{label}</label>}
       <div
         ref={containerRef}
@@ -158,7 +160,12 @@ function Dropdown<T extends DropdownOption>({
             disabled={loading || !!error}
           >
             {getDisplayText()}
-            <span className="dropdown__arrow">▼</span>
+              <IconSprite />            
+              <span className="dropdown__arrow">
+                <svg width="15" height="8" aria-hidden="true">
+                  <use href="#ArrowSVG" />                            
+                </svg>            
+              </span>            
           </button>
 
           {error && <p className="dropdown__error">{error}</p>}

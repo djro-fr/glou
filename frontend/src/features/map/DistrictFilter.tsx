@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import Dropdown from '../../shared/components/Dropdown';
 import type { District } from './types/district';
 
+import './DistrictFilter.scss';
+
 interface DropdownDistrict extends District {
   id: number;
   label: string;
