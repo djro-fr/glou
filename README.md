@@ -6,6 +6,7 @@ Interactive map listing the ~480 public drinking water fountains in Toulouse, bu
 
 - **Frontend**: React + TypeScript + OpenStreetMap & MapLibre GL JS + SCSS
 - **Basemap**: Positron style via openmaptiles.geo.data.gouv.fr (Etalab)
+- **Cartography**: MapLibre GL JS clustering with color-coded markers (status-based)
 - **Backend**: Node.js + Express
 - **Database**: PostgreSQL
 - **CI/CD**: GitHub Actions + Docker Compose deployment on a VPS
@@ -28,6 +29,13 @@ and transformed into CSS variables via Style Dictionary.
 
 `npm run build-tokens` → generates `build/css/tokens.css` (do not edit directly)
 
+## Performance optimizations
+
+- Lazy-loaded MapLibre GL JS via dynamic `import()` to reduce initial bundle (103 KiB → reduced from 364 KiB)
+- Mobile-first architecture with responsive marker clustering
+- Non-render-blocking font loading via media queries
+- Lighthouse mobile score: 85/100, LCP: 3.2s, CLS: 0.029
+
 ## Live demo
 
 _Coming soon, once deployed._
@@ -36,13 +44,19 @@ _Coming soon, once deployed._
 
 ### Prerequisites
 
-- Node.js v24.16.0+
+- Node.js v24.16.0 LTS or higher
 - Docker & Docker Compose
 - PostgreSQL running (via Docker Compose or locally on port 5433)
 
 ### Steps
 
-1. **Clone the repo and install dependencies**
+1. **On Windows: Start Docker Desktop**
+
+   Open Docker Desktop app and wait until it shows "running" status.
+
+   _(Skip this step on Linux/macOS)_
+
+2. **Clone the repo and install dependencies**
 
    ```bash
       git clone <repo-url>
@@ -62,14 +76,14 @@ _Coming soon, once deployed._
       cd ..
    ```
 
-2. Set up environment variables
+3. **Set up environment variables**
 
    ```bash
       cp .env.example .env
       # Edit .env with your PostgreSQL credentials
    ```
 
-3. **Start PostgreSQL** (if using Docker Compose)
+4. **Start PostgreSQL**
 
    ```bash
       docker compose up -d
@@ -77,10 +91,24 @@ _Coming soon, once deployed._
 
    Wait for the database to be ready (schema and districts are auto-seeded).
 
-4. **Seed the fountains** (one-time after first `docker compose up`)
+5. **Seed the fountains** (one-time after first `docker compose up`)
 
    ```bash
       npx tsx db/scripts/seed-fountains.ts
+   ```
+
+   The map will render with ~481 fountains clustered by default (zoom to expand clusters).
+
+6. **Start the development servers** (in separate terminals)
+
+   ```bash
+      # Terminal 1: Start backend (port 3000)
+      cd backend
+      npx tsx src/app.ts
+
+      # Terminal 2: Frontend (port 5173 Vite dev server)
+      cd frontend 
+      npm run dev
    ```
 
 ### Notes
@@ -107,7 +135,20 @@ _Coming soon, once deployed._
 │       ├── Repository/   # Data access (PostgreSQL, SMTP)
 │       ├── DTO/          # Zod validation schemas
 │       └── Middleware/   # Global error handling
-└── README.md
+├── frontend/
+│   ├── design-system/
+│   │   └── tokens.json      # Design tokens (Tokens Studio / DTCG format)
+│   ├── public/              # Static assets (fonts, icons, images, favicons)
+│   └── src/   
+│       ├── features/        # Feature-based structure
+│       │   ├── about/   
+│       │   ├── contact/   
+│       │   └── map/         # Fountain map with clustering & details panel
+│       │       └── types/   # Map feature TypeScript interfaces (district, fountain)
+│       ├── shared/          # Reusable components, helpers, layout, styles
+│       └── routes.ts        # React Router configuration
+├── README.md
+└── [config files: tsconfig.json, vite.config.ts, etc.]
 ```
 
 ## Database
@@ -133,4 +174,4 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 
 ## Last update
 
-September 21, 2026
+September 23, 2026

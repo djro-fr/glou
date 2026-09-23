@@ -130,10 +130,13 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 | Containerization | Docker Compose (frontend, backend, PostgreSQL) |
 
 - Design tokens pipeline: Tokens Studio (Figma) → DTCG format (tokens.json) → Style Dictionary (@tokens-studio/sd-transforms) → CSS custom properties (tokens.css)
+- Clustering: Native MapLibre GL JS with GeoJSON source
+- Lazy-loaded MapLibre GL JS to optimize mobile LCP
 - Routing: React Router
 - Contact: `POST /contact` route on the Express backend, sent via Nodemailer (SMTP provider TBD, Gmail, OVH, or another option depending on what's already available on your domain)
 - Basic anti-spam measure planned (simple honeypot)
 - V1 state management: local React state (`useState`), simple and sufficient for the current scope. Migration to Redux Toolkit planned for V2 (learning objective)
+- Font: Self-hosted Ubuntu (no external CDN, non-render-blocking via media queries)
 
 ### Error handling & validation
 
@@ -161,6 +164,7 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 - Lint (ESLint)
 - Tests (if written)
 - Build (frontend + backend)
+- SonarQube for IDE checks (code quality)
 
 **CD, triggered on push to `main`:**
 
@@ -175,13 +179,22 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 ---
 
-## 9. Definition of Done for V1
+## 9. Performance & Metrics
 
-- [ ] Navigation between the 3 pages (map/About/Contact) working
-- [ ] About page accessible and up to date
-- [ ] Functional map displaying all ~480 fountains with clustering
-- [ ] Filters (city, district, type, status) working, with bidirectional city/district dependency
-- [ ] Fountain details accessible on click
+- Lighthouse mobile: 85/100
+- Largest Contentful Paint (LCP): 3.2s
+- Cumulative Layout Shift (CLS): 0.029
+- Initial bundle (lazy-loaded MapLibre): 103 KiB
+
+---
+
+## 10. Definition of Done for V1
+
+- [x] Navigation between the 3 pages (map/About/Contact) working
+- [x] About page accessible and up to date
+- [x] Functional map displaying all ~480 fountains with clustering
+- [x] Filters (city, district, type, status) working, with bidirectional city/district dependency
+- [x] Fountain details accessible on click
 - [x] Functional backend API connected to PostgreSQL
 - [ ] Passing CI pipeline (lint, build)
 - [ ] Live deployment on the VPS, application accessible online
@@ -190,7 +203,7 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 ---
 
-## 10. V2 ideas
+## 11. V2 ideas
 
 - User geolocation + proximity search (PostGIS)
 - Address/street search (geocoding, e.g. API Adresse or Nominatim), combined with geolocation
@@ -199,4 +212,4 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 ## Last update
 
-September 20, 2026
+September 23, 2026
