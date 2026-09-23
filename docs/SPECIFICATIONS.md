@@ -208,8 +208,9 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 ### High priority
 
 - **User geolocation + proximity search**: Display fountains sorted by distance from user location. Enable address/street search (geocoding via API Adresse or Nominatim) to combine with geolocation. Requires PostGIS for spatial queries.
-
 - **Status updates**: Allow users to update fountain status (open/closed) with timestamp tracking
+- **Accessibility audit & improvements**: Full ARIA validation, keyboard navigation testing, screen reader compatibility
+- **SEO optimization**: Meta tags, structured data (Schema.org), Open Graph, sitemap, robots.txt
 
 ### Medium priority
 

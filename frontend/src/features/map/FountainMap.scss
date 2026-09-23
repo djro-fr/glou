@@ -18,4 +18,14 @@ main.map-page{
   div#map{
     height: 100svh;
   }
+  .filter-bar{  
+    position: absolute;
+    width: 100%;
+    bottom: 120px;
+    display: flex;
+    justify-content: center;
+    background: white;  
+    padding: 1rem;
+  }
+  
 }

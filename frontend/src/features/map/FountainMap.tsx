@@ -7,7 +7,10 @@ import type { Fountain } from "./types/fountain";
 import "./FountainMap.scss";
 
 import { getCSSVariable } from "../../shared/helpers/getCSSVariable";
+
 import FountainDetails from "./FountainDetails";
+import DistrictFilter from "./DistrictFilter";
+import type { District } from "./types/district";
 
 function fountainsToGeoJSON(fountains: Fountain[]) {
   return {
@@ -206,6 +209,10 @@ function initFountainLayer(
     });
 }
 
+function handleDistrictSelect(district: District | null) {
+   console.log('District selected:', district);
+}
+
 function FountainMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
@@ -256,6 +263,9 @@ function FountainMap() {
       {selectedFountain && (
         <FountainDetails fountain={selectedFountain} onClose={() => setSelectedFountain(null)} />
       )}
+      <div className="filter-bar">
+        <DistrictFilter onSelect={handleDistrictSelect} />
+      </div>
     </>
   );
 }
