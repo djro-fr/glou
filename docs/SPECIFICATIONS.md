@@ -180,10 +180,12 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 ## 9. Performance & Metrics
 
-- Lighthouse mobile: 85/100
-- Largest Contentful Paint (LCP): 3.2s
+- Lighthouse mobile: 89/100
+- First Contentful Paint (FCP): 2.4s
+- Largest Contentful Paint (LCP): 2.9s
+- Total Blocking Time (TBT): 180ms
 - Cumulative Layout Shift (CLS): 0.029
-- Initial bundle (lazy-loaded MapLibre): 103 KiB
+- Speed Index: 2.4s
 
 ---
 
