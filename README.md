@@ -4,13 +4,13 @@ Interactive map listing the ~480 public drinking water fountains in Toulouse, bu
 
 ## Tech Stack
 
-- **Frontend**: React + TypeScript + OpenStreetMap & MapLibre GL JS + SCSS
+- **Frontend**: Svelte 5 + TypeScript + OpenStreetMap & MapLibre GL JS + SCSS
 - **Basemap**: Positron style via openmaptiles.geo.data.gouv.fr (Etalab)
 - **Cartography**: MapLibre GL JS clustering with color-coded markers (status-based)
 - **Backend**: Node.js + Express
 - **Database**: PostgreSQL
 - **CI/CD**: GitHub Actions + Docker Compose deployment on a VPS
-- **Routing**: React Router
+- **Routing**: @keenmate/svelte-spa-router (history mode)
 - **Contact form**: Nodemailer (backend)
 
 ## Mockups
@@ -146,7 +146,7 @@ _Coming soon, once deployed._
 │       │   └── map/         # Fountain map with clustering & details panel
 │       │       └── types/   # Map feature TypeScript interfaces (district, fountain)
 │       ├── shared/          # Reusable components, helpers, layout, styles
-│       └── routes.ts        # React Router configuration
+│       └── routes.ts        # Router configuration
 ├── README.md
 └── [config files: tsconfig.json, vite.config.ts, etc.]
 ```
@@ -174,4 +174,4 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 
 ## Last update
 
-September 23, 2026
+September 26, 2026

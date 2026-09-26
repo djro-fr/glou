@@ -69,7 +69,7 @@
 - Contact page: form (name, email, subject, message) sent via a dedicated backend (Nodemailer)
 - Server-side field validation (valid email, required fields)
 - Basic anti-spam measure planned (simple honeypot)
-- Client-side routing added (React Router) to navigate between the map, About and Contact
+- Client-side routing added (@keenmate/svelte-spa-router) to navigate between the map, About and Contact
 
 ---
 
@@ -121,7 +121,7 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 | Layer | Tech |
 | --- | --- |
-| Frontend | React + TypeScript + MapLibre GL JS + clustering via MapLibre (GeoJSON source + built-in clustering) + SCSS |
+| Frontend | Svelte 5 + TypeScript + MapLibre GL JS + clustering via MapLibre (GeoJSON source + built-in clustering) + SCSS |
 | Basemap | Positron style via openmaptiles.geo.data.gouv.fr (Etalab, free, OSM-based) |
 | Backend | Node.js + Express |
 | Database | PostgreSQL (no PostGIS extension in V1) |
@@ -132,10 +132,9 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 - Design tokens pipeline: Tokens Studio (Figma) → DTCG format (tokens.json) → Style Dictionary (@tokens-studio/sd-transforms) → CSS custom properties (tokens.css)
 - Clustering: Native MapLibre GL JS with GeoJSON source
 - Lazy-loaded MapLibre GL JS to optimize mobile LCP
-- Routing: React Router
+- Routing: @keenmate/svelte-spa-router (history mode)
 - Contact: `POST /contact` route on the Express backend, sent via Nodemailer (SMTP provider TBD, Gmail, OVH, or another option depending on what's already available on your domain)
 - Basic anti-spam measure planned (simple honeypot)
-- V1 state management: local React state (`useState`), simple and sufficient for the current scope. Migration to Redux Toolkit planned for V2 (learning objective)
 - Font: Self-hosted Ubuntu (no external CDN, non-render-blocking via media queries)
 
 ### Error handling & validation
@@ -216,12 +215,10 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 - **Fountain photos**: Add square photo storage and display in fountain details panel
 
-- Migrate state management (filters, fountain data) to Redux Toolkit (learning objective, skill-building)
-
 ### Lower priority
 
 - More advanced automated deployment (staging/production)
 
 ## Last update
 
-September 23, 2026
+September 26, 2026
