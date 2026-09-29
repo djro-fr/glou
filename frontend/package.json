@@ -6,7 +6,7 @@
   "scripts": {
     "build-tokens": "npx tsx build-tokens.ts",
     "dev": "vite",
-    "build": "npx tsx build-tokens.ts && tsc -b  --outDir dist && vite build",
+    "build": "npx tsx build-tokens.ts && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
