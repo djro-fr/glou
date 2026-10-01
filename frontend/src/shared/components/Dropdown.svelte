@@ -19,7 +19,7 @@
 <script lang="ts" generics="T extends DropdownOption">
   import './Dropdown.scss';
   import IconSprite from './IconSprite.svelte';
-  import { slugify } from '../helpers/string';
+  import { slugify, truncateText } from '../helpers/string';
 
   let {
     options,
@@ -114,7 +114,7 @@
 
   function getDisplayText(): string {
     if (loading) return 'Chargement...';
-    if (selected) return selected.label;
+    if (selected) return truncateText(selected.label, 35);
     if (hasInteracted) return clearLabel;
     return displayPlaceholder;
   }

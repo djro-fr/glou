@@ -9,6 +9,7 @@
   import FountainDetails from './FountainDetails.svelte';
   import DistrictFilter from './DistrictFilter.svelte';
   import type { District } from './types/district';
+  import IconSprite from '../../shared/components/IconSprite.svelte';
 
   function fountainsToGeoJSON(fountains: Fountain[]) {
     return {
@@ -252,4 +253,11 @@
 {/if}
 <div class="filter-bar">
   <DistrictFilter onSelect={handleDistrictSelect} />
+  <a href="/">
+    <div class="filter-btn">
+      <IconSprite />
+      <svg><use href="#FilterSVG" /></svg>
+      <p>Filtrer</p>
+    </div>
+  </a>
 </div>

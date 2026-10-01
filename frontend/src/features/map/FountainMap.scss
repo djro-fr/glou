@@ -1,5 +1,8 @@
 @use '../../shared/styles/tokens.scss' as *;
 
+@use '../../shared/styles/breakpoints' as bp;
+
+
 main.map-page{
   padding: 0;
   margin: 0;
@@ -10,7 +13,7 @@ main.map-page{
     z-index: 1;
     color:$primary-700;
     text-align: center;
-    width: 100%;
+    width: 100%;    
     padding-top: 1rem;  
     padding-bottom: 3rem;
     background: linear-gradient(180deg,rgba(255, 255, 255, .9) 0%, rgba(255, 255, 255, .5) 70%, rgba(255, 255, 255, 0) 100%);   
@@ -20,12 +23,72 @@ main.map-page{
   }
   .filter-bar{  
     position: absolute;
-    width: 100%;
-    bottom: 120px;
+    width: calc(100% - 2 * $space-md);
+    max-width: 30rem;
+    height: 100px;
+    bottom: 91px;        
     display: flex;
-    justify-content: center;
+    justify-content: center;    
+    align-items: center;
     background: white;  
-    padding: 1rem;
+    padding-left: 1rem;
+    margin-left: calc((100% - 30rem)/2);
+    border-radius: $rounded-sm;
+    box-shadow: $shd-overlay;
+    @media screen and (max-width: calc(30rem + 2*$space-md )) {
+      margin-left: $space-md; 
+    }
+    @include bp.bp($max: xs) {      
+      height: 105px;
+    }
+    &:has(.dropdown ul){
+      border-radius: 0 0 $rounded-sm $rounded-sm;    
+    }    
+    .custom-dropdown.quartier{
+      padding-right: 1rem;
+    }
+    a{      
+      height: 100%;         
+      text-decoration: none;
+      color:$neutral-800;
+      &:active{        
+        p{          
+          transform: translateY(10px);
+          opacity: .4;
+        }
+        svg{
+          transform: translateY(10px);
+          color:$neutral-800;
+          opacity: .4;
+        }
+      }
+      .filter-btn{        
+        p, svg {       
+          transition: transform .2s ease, opacity .2s ease;
+        }
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;      
+        border-radius: 0 $rounded-sm $rounded-sm 0;
+        width: 100px;      
+        margin: 0;
+        background-color: $primary-500;      
+        padding: 1rem;
+        svg{
+          width: 18px;
+          height: 1.7rem;
+        }
+        p{
+          font-size: $ft-siz-x-small;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          padding: 0;
+        }    
+      }
+    }
   }
   
 }

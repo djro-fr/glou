@@ -37,3 +37,7 @@ export function slugify(text: string | undefined): string {
     .replace(/^-/, '')  
     .replace(/-$/, ''); 
 }
+
+export function truncateText(text: string, maxLength: number = 25): string {
+  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+}
