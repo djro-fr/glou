@@ -194,13 +194,33 @@
   }
 
   function handleDistrictSelect(district: District | null) {
-    console.log('District selected:', district);
+    if (!map) return;
+    zoomDistrict(district, map);
+  }
+ 
+  function zoomDistrict(district: District | null, mapInstance: Map) {
+    if (!district) {
+      mapInstance.easeTo({ center: [1.44, 43.6], zoom: 12 });
+      return;
+    }
+
+    const inDistrict = fountains.filter((f) => f.district_number === district.number_d);
+    if (inDistrict.length === 0) return;
+
+    const lngs = inDistrict.map((f) => f.longitude);
+    const lats = inDistrict.map((f) => f.latitude);
+
+    mapInstance.fitBounds(
+      [
+        [Math.min(...lngs), Math.min(...lats)],
+        [Math.max(...lngs), Math.max(...lats)],
+      ],
+      { padding: 50, maxZoom: 14 }
+    );
   }
 
   let mapContainer: HTMLDivElement | undefined = $state();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let map: Map | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let map: Map | null = null;  
   let fountains: Fountain[] = [];
   let selectedFountain: Fountain | null = $state(null);
 
@@ -242,6 +262,7 @@
     return () => {
       cancelled = true;
       mapInstance?.remove();
+      map = null;
     };
   });
 </script>
