@@ -24,10 +24,14 @@ The full spec (context, user stories, data model, architecture, API endpoints, d
 
 ## Design tokens
 
-Tokens are defined in [`design-system/tokens.json`](design-system/tokens.json) (Tokens Studio / DTCG format)
-and transformed into CSS variables via Style Dictionary.
+Tokens are defined in [`frontend/design-system/tokens.json`](frontend/design-system/tokens.json) (Tokens Studio / DTCG format) and transformed into CSS and SCSS variables via Style Dictionary.
 
-`npm run build-tokens` → generates `build/css/tokens.css` (do not edit directly)
+`npm run build-tokens` (from `frontend/`) → generates `frontend/src/shared/styles/tokens.css` and `frontend/src/shared/styles/tokens.scss` (do not edit directly)
+
+### Why two formats?
+
+- `tokens.scss` for SCSS styles (`$primary-700`)
+- `tokens.css` for JS and MapLibre (`--primary-700` via `getComputedStyle`), imported globally in the entry point (`main.ts`)
 
 ## Performance optimizations
 
@@ -174,4 +178,4 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 
 ## Last update
 
-September 26, 2026
+October 27, 2026
