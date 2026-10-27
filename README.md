@@ -30,10 +30,10 @@ Tokens are defined in [`frontend/design-system/tokens.json`](frontend/design-sys
 
 ### Why two formats?
 
-Sass variables only exist at compile time, so MapLibre, configured in JS, needs the CSS custom properties.
-
 - `tokens.scss` for SCSS styles (`$primary-700`)
 - `tokens.css` for JS and MapLibre (`--primary-700` via `getComputedStyle`), imported globally in the entry point (`main.ts`)
+
+Sass variables only exist at compile time, so MapLibre, configured in JS, needs the CSS custom properties.
 
 ## Performance optimizations
 
@@ -78,6 +78,11 @@ _Coming soon, once deployed._
 
       # Install db script dependencies
       cd db
+      npm install
+      cd ..
+
+      # Install frontend dependencies (Vite, Svelte, Sass, Style Dictionary, tsx)
+      cd frontend
       npm install
       cd ..
    ```
