@@ -13,6 +13,8 @@
     clearLabel?: string;
     loading?: boolean;
     error?: string | null;
+    direction?: 'up' | 'down';
+    disabled?: boolean;
   }
 </script>
 
@@ -31,6 +33,8 @@
     clearLabel = 'Tous',
     loading = false,
     error = null,
+    direction = 'up',
+    disabled = false,
   }: Props<T> = $props();
 
   const labelId = `dropdown-label-${Math.random().toString(36).slice(2, 9)}`;  
@@ -139,7 +143,7 @@
       aria-haspopup="listbox"
       aria-controls="dropdown-listbox"
       aria-label={ariaLabel}
-      disabled={loading || !!error}
+      disabled={disabled || loading || !!error}
     >
       {getDisplayText()}
       <IconSprite />
@@ -155,7 +159,7 @@
     {/if}
 
     {#if isOpen && !loading && !error}
-      <ul id="dropdown-listbox" class="dropdown__menu" role="listbox">
+      <ul id="dropdown-listbox" class="dropdown__menu"  class:dropdown__menu--down={direction === 'down'} role="listbox">
         <li
           class="dropdown__option dropdown__option--clear"
           class:dropdown__option--focused={focusedIndex === 0}

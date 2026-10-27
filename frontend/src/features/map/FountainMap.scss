@@ -17,6 +17,10 @@ main.map-page{
     padding-top: 1rem;  
     padding-bottom: 3rem;
     background: linear-gradient(180deg,rgba(255, 255, 255, .9) 0%, rgba(255, 255, 255, .5) 70%, rgba(255, 255, 255, 0) 100%);   
+    text-shadow: 2px 3px 3px rgba(255, 255, 255, 1) ;
+    &.hidden{
+      opacity: 0;
+    }
   }
   div#map{
     height: 100svh;
@@ -30,8 +34,7 @@ main.map-page{
     display: flex;
     justify-content: center;    
     align-items: center;
-    background: white;  
-    padding-left: 1rem;
+    background: white;      
     margin-left: calc((100% - 30rem)/2);
     border-radius: $rounded-sm;
     box-shadow: $shd-overlay;
@@ -44,8 +47,8 @@ main.map-page{
     &:has(.dropdown ul){
       border-radius: 0 0 $rounded-sm $rounded-sm;    
     }    
-    .custom-dropdown.quartier{
-      padding-right: 1rem;
+    >.quartier{
+      padding: 0 1rem;
     }
     a{      
       height: 100%;         
@@ -61,32 +64,6 @@ main.map-page{
           color:$neutral-800;
           opacity: .4;
         }
-      }
-      .filter-btn{        
-        p, svg {       
-          transition: transform .2s ease, opacity .2s ease;
-        }
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100%;      
-        border-radius: 0 $rounded-sm $rounded-sm 0;
-        width: 100px;      
-        margin: 0;
-        background-color: $primary-500;      
-        padding: 1rem;
-        svg{
-          width: 18px;
-          height: 1.7rem;
-        }
-        p{
-          font-size: $ft-siz-x-small;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          padding: 0;
-        }    
       }
     }
   }

@@ -3,7 +3,6 @@
   import './FountainDetails.scss';
 
   import { sanitizeString } from '../../shared/helpers/string';
-  import IconSprite from '../../shared/components/IconSprite.svelte';
 
   interface Props {
     fountain: Fountain;
@@ -26,8 +25,7 @@
 <div class="fountain-panel">
   <div class="content">
     <div class="close-wrapper">
-      <button onclick={onClose} aria-label="Fermer">
-        <IconSprite />
+      <button onclick={onClose} aria-label="Fermer">        
         <svg width="20" height="20" aria-hidden="true">
           <use href="#CloseSVG" />
         </svg>

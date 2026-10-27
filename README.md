@@ -1,13 +1,22 @@
 # GLOU Toulouse - Drinking Water Fountains in Toulouse
 
-Interactive map listing the ~480 public drinking water fountains in Toulouse, built from Toulouse Métropole's open data. The app also includes a project presentation page and a contact form.
+Interactive map listing the 481 public drinking water fountains in Toulouse, built from Toulouse Métropole's open data. The app also includes a project presentation page and a contact form.
+
+## Features
+
+- Interactive map with clustering and status-based markers
+- Filter panel (mobile-first): city, district, type, status — combinable
+- Quick district filter, kept in sync with the filter panel (shared state)
+- Client-side filtering: fountains are fetched once, filtered in the browser
+- Auto-zoom on the selected city or district
+- Toulouse selected by default
 
 ## Tech Stack
 
-- **Frontend**: Svelte 5 + TypeScript + OpenStreetMap & MapLibre GL JS + SCSS
+- **Frontend**: Svelte 5 + Vite + TypeScript + OpenStreetMap & MapLibre GL JS + SCSS
 - **Basemap**: Positron style via openmaptiles.geo.data.gouv.fr (Etalab)
 - **Cartography**: MapLibre GL JS clustering with color-coded markers (status-based)
-- **Backend**: Node.js + Express
+- **Backend**: Node.js + Express + TypeScript
 - **Database**: PostgreSQL
 - **CI/CD**: GitHub Actions + Docker Compose deployment on a VPS
 - **Routing**: @keenmate/svelte-spa-router (history mode)
@@ -39,7 +48,7 @@ Sass variables only exist at compile time, so MapLibre, configured in JS, needs 
 
 - Lazy-loaded MapLibre GL JS via dynamic `import()` to reduce initial bundle (103 KiB → reduced from 364 KiB)
 - Mobile-first architecture with responsive marker clustering
-- Non-render-blocking font loading via media queries
+- Non-render-blocking font stylesheet (`media="print"` swap) + preload of the main font file (Ubuntu Bold)
 - Lighthouse mobile score: 85/100, LCP: 3.2s, CLS: 0.029
 
 ## Live demo
@@ -108,7 +117,7 @@ _Coming soon, once deployed._
       npx tsx db/scripts/seed-fountains.ts
    ```
 
-   The map will render with ~481 fountains clustered by default (zoom to expand clusters).
+   The map will render with 481 fountains clustered by default (zoom to expand clusters).
 
 6. **Start the development servers** (in separate terminals)
 
@@ -154,8 +163,9 @@ _Coming soon, once deployed._
 │       ├── features/        # Feature-based structure
 │       │   ├── about/   
 │       │   ├── contact/   
-│       │   └── map/         # Fountain map with clustering & details panel
-│       │       └── types/   # Map feature TypeScript interfaces (district, fountain)
+│       │   └── map/         # Fountain map with clustering, details panel & filters
+│       │       ├── types/   # Map feature TypeScript interfaces (district, fountain)
+│       │       └── *.svelte.ts  # Shared reactive state (filters, districts)
 │       ├── shared/          # Reusable components, helpers, layout, styles
 │       └── routes.ts        # Router configuration
 ├── README.md
@@ -182,6 +192,13 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 ## Data source
 
 [data.toulouse-metropole.fr, Fontaines à boire](https://data.toulouse-metropole.fr/explore/dataset/fontaines-a-boire/) (ODbL license)
+
+## Known limitations
+
+- 38 fountains have no district in the source dataset (35 in Toulouse, 3 in Tournefeuille):
+  they are shown on the map but don't appear under any district filter.
+  V2 idea: compute their district from coordinates with PostGIS (`ST_Contains`).
+- Some status values are empty in the dataset and can't be selected in the status filter.
 
 ## Last update
 

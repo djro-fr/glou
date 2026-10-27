@@ -4,7 +4,7 @@ export async function getAllFountains(listConditions: string, values: string[]) 
   const result = await client.query(
     `SELECT f.*, d.name_d
     FROM fountain f 
-    JOIN district d 
+    LEFT JOIN district d 
     ON f.district_number = d.number_d
     ${listConditions};`, 
    values);
@@ -15,8 +15,8 @@ export async function getFountainById(id:number) {
   const result = await client.query(
     `SELECT f.*, d.name_d
      FROM fountain f     
-     JOIN district d 
+     LEFT JOIN district d 
      ON f.district_number = d.number_d
-     WHERE id =$1;`, [id]);
+     WHERE f.id =$1;`, [id]);
   return result.rows;
 }

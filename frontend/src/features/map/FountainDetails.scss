@@ -2,7 +2,7 @@
 
 
 .fountain-panel{
-  z-index: 1;
+  z-index: 3;
   position: absolute;
   top: 0;
   width: 100%;
@@ -29,7 +29,7 @@
       justify-content: end;
       button{
         position: relative;      
-        background-color: transparent!important;      
+        background-color: transparent;      
         border: 0;
         padding: 1.5rem;
         svg{
