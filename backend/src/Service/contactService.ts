@@ -1,5 +1,7 @@
+import type { ContactInput } from '../DTO/contactSchema.ts';
 import {sendContactEMail} from '../Repository/contactRepository.ts'
 
-export async function sendContactEMailService(name: string, email: string, subject: string, message: string){     
+export async function sendContactEMailService(input: ContactInput){     
+  const { name, email, subject, message } = input;
   return await sendContactEMail(name, email, subject, message);    
 }

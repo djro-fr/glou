@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export type ContactInput = z.infer<typeof contactSchema>;
+
 export const contactSchema = z.object({
   name: z.string().min(1),
   email: z.email(),  

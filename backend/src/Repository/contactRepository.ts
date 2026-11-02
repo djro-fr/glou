@@ -5,7 +5,7 @@ export async function sendContactEMail(name: string, email: string, subject: str
     from: process.env.SMTP_USER,
     replyTo: email,
     to: process.env.SMTP_USER, 
-    subject: subject, 
+    subject: `[GLOU Contact] ${subject}`, 
     text: `Nom: ${name}\nEmail: ${email}\nMessage: ${message}`, 
   });
   return info;
