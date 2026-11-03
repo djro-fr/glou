@@ -1,6 +1,5 @@
 <script lang="ts">
   import Dropdown, { type DropdownOption } from "../../shared/components/Dropdown.svelte";
-  import "./FilterPanel.scss";
   import type { Fountain } from "./types/fountain";
   import { filters, setDistrict } from "./filters.svelte.js";
   import { districtsState } from "./districts.svelte";

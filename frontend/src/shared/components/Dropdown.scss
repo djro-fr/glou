@@ -27,6 +27,8 @@
       font-family: $family-text;
       background-color: transparent;
       border: none;
+      border-radius: 0;
+      flex-direction: row;
       border-bottom: 1px solid $neutral-400;
       padding: 0.15rem 0.1rem 0.3rem;
       cursor: pointer;

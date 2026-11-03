@@ -1,0 +1,172 @@
+@use './tokens.scss' as *;
+
+button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: $rounded-full;
+  background-color: $primary-500;
+  border: none;
+  padding: 1rem;
+  font-family: $family-text;
+  font-size: $ft-siz-large;
+  font-weight: 400;
+
+  &.filter-btn {
+    height: 100%;
+    width: 110px;
+    margin: 0;
+    border-radius: 0 $rounded-sm $rounded-sm 0;
+
+    span,
+    svg {
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    svg {
+      width: 18px;
+      height: 1.7rem;
+    }
+
+    span {
+      font-size: $ft-siz-2x-small;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0;
+    }
+  }
+
+  &.contact {
+    margin-top: 2rem;
+    padding: 1rem 2rem;
+    background-color: $primary-700;
+    color: $neutral-0;
+    font-family: inherit;
+  }
+
+}
+
+form {
+  font-family: $family-text;
+  padding: 1rem 2rem 2rem;
+
+  .field {
+    label {
+      display: block;
+      font-size: $ft-siz-2x-small;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: $primary-700;
+      margin-bottom: 0.25rem;
+    }
+
+    input,
+    textarea {
+      margin-bottom: 2rem;
+      padding-bottom: .2rem;
+      width: 100%;
+      &::placeholder {
+        color: $neutral-400;
+        opacity: 1;
+      }
+
+      &:focus {
+        outline: 0;
+        border-bottom: 1px solid $primary-400;
+      }
+    }
+
+    input[aria-invalid="true"],
+    textarea[aria-invalid="true"] {
+      border-bottom: 1px solid $danger-500;
+    }
+
+    input {
+      border: 0;
+      border-bottom: 1px solid $neutral-400;
+      font-family: $family-text;
+      font-size: $ft-siz-medium;
+      color: $neutral-700;
+    }
+
+    textarea {
+      border: 0;
+      border-bottom: 1px solid $neutral-400;
+      font-family: $family-text;
+      font-size: $ft-siz-medium;
+      color: $neutral-700;
+    }
+  }
+
+  .success {
+    padding: .5rem 1rem 1rem;
+    margin: 2rem 0 2rem;
+    border-radius: $rounded-sm;
+    background-color: $success-100;
+    color: $neutral-800;
+    font-size: $ft-siz-small;
+    text-align: center;
+  }
+
+  .error {
+    padding: .5rem 1rem 1rem;
+    margin: -2rem 0 2rem;
+    border-radius: 0 0 $rounded-sm $rounded-sm;
+    background-color: $danger-100;
+    color: $neutral-800;
+    font-size: $ft-siz-small;
+  }
+
+  .miel {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  button {
+    padding: 1rem 2rem;
+    box-shadow: $shd-btn;
+  }
+
+}
+
+main dialog {
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: $rounded-md;
+
+  .close-wrapper {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: end;
+
+    button {
+      background-color: transparent;
+      border: 0;
+      padding: 0rem;
+
+      svg {
+        color: $primary-500;
+      }
+    }
+  }
+
+  .panel-content {
+    h2 {
+      padding: 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .dropdown {
+      margin-bottom: 1.5rem;
+    }
+  }
+}
