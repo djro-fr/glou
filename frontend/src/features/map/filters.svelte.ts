@@ -1,23 +1,34 @@
 import type { Fountain } from './types/fountain';
 
+export const DEFAULT_CITY = "Toulouse";
+
+export function resetFilters() {
+  filters.city = DEFAULT_CITY;
+  setDistrict(null);
+  filters.type = null;
+  filters.status = null;
+}
+
 export const filters = $state({
-  city: 'Toulouse' as string | null,
+  city: DEFAULT_CITY  as string | null,
   district: null as number | null,
   type: null as string | null,
   status: null as string | null,
 });
 
-export function matchesFilters(f: Fountain): boolean {
+export type FilterKey = "city" | "district" | "type" | "status";
+
+export function matchesFilters(f: Fountain, except?: FilterKey): boolean {
   return (
-    (filters.city === null || f.city === filters.city) &&
-    (filters.district === null || f.district_number === filters.district) &&
-    (filters.type === null || f.type_f === filters.type) &&
-    (filters.status === null || f.status_f === filters.status)     
+    (except === "city" || filters.city === null || f.city === filters.city) &&
+    (except === "district" || filters.district === null || f.district_number === filters.district) &&
+    (except === "type" || filters.type === null || f.type_f === filters.type) &&
+    (except === "status" || filters.status === null || f.status_f === filters.status)     
   );
 }
 
 export function isDistrictAvailable(city: string | null): boolean {
-  return city === 'Toulouse';
+  return city === DEFAULT_CITY ;
 }
 
 export function setCity(city: string | null) {
@@ -27,5 +38,5 @@ export function setCity(city: string | null) {
 
 export function setDistrict(district: number | null) {
   filters.district = district;
-  if (district !== null) filters.city = 'Toulouse'; 
+  if (district !== null) filters.city = DEFAULT_CITY ; 
 }

@@ -228,7 +228,7 @@
   let map: Map | null = null;
   let fountains: Fountain[] = $state.raw([]);
   let selectedFountain: Fountain | null = $state(null);
-  let filteredFountains = $derived(fountains.filter(matchesFilters));
+  let filteredFountains = $derived(fountains.filter((f) => matchesFilters(f)));
 
   $effect(() => {
     if (!mapContainer) return;
@@ -271,7 +271,7 @@
   });
 
   $effect(() => {
-    const { city, district } = filters; // ces deux lectures déclarent les dépendances
+    const { city, district } = filters; 
 
     untrack(() => {
       if (!map) return;

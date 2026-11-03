@@ -139,6 +139,7 @@
   >
     <button
       class="dropdown__button"
+      type="button"
       onclick={() => (isOpen = !isOpen)}
       aria-haspopup="listbox"
       aria-controls="dropdown-listbox"

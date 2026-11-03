@@ -8,27 +8,35 @@ button {
   border-radius: $rounded-full;
   background-color: $primary-500;
   border: none;
-  padding: 1rem;
   font-family: $family-text;
-  font-size: $ft-siz-large;
-  font-weight: 400;
-
+  font-size: $ft-siz-medium;
+  padding: 1rem 2rem;
+  box-shadow: $shd-btn;
+  &.primary{    
+    padding: 1rem 2rem;
+    background-color: $primary-500;    
+  }
+  &.secondary{
+    background-color: $neutral-300;    
+    padding: 0rem 1rem;
+    color: $neutral-600;
+    height: 2.4rem;
+  }
   &.filter-btn {
     height: 100%;
     width: 110px;
     margin: 0;
-    border-radius: 0 $rounded-sm $rounded-sm 0;
-
+    padding: 1rem;
+    border-radius: 0 $rounded-sm $rounded-sm 0;    
+    box-shadow: none;
     span,
     svg {
       transition: transform .2s ease, opacity .2s ease;
     }
-
     svg {
       width: 18px;
       height: 1.7rem;
     }
-
     span {
       font-size: $ft-siz-2x-small;
       font-weight: 600;
@@ -37,7 +45,6 @@ button {
       padding: 0;
     }
   }
-
   &.contact {
     margin-top: 2rem;
     padding: 1rem 2rem;
@@ -45,13 +52,11 @@ button {
     color: $neutral-0;
     font-family: inherit;
   }
-
 }
 
 form {
   font-family: $family-text;
   padding: 1rem 2rem 2rem;
-
   .field {
     label {
       display: block;
@@ -62,7 +67,6 @@ form {
       color: $primary-700;
       margin-bottom: 0.25rem;
     }
-
     input,
     textarea {
       margin-bottom: 2rem;
@@ -72,18 +76,15 @@ form {
         color: $neutral-400;
         opacity: 1;
       }
-
       &:focus {
         outline: 0;
         border-bottom: 1px solid $primary-400;
       }
     }
-
     input[aria-invalid="true"],
     textarea[aria-invalid="true"] {
       border-bottom: 1px solid $danger-500;
     }
-
     input {
       border: 0;
       border-bottom: 1px solid $neutral-400;
@@ -91,7 +92,6 @@ form {
       font-size: $ft-siz-medium;
       color: $neutral-700;
     }
-
     textarea {
       border: 0;
       border-bottom: 1px solid $neutral-400;
@@ -100,7 +100,6 @@ form {
       color: $neutral-700;
     }
   }
-
   .success {
     padding: .5rem 1rem 1rem;
     margin: 2rem 0 2rem;
@@ -110,7 +109,6 @@ form {
     font-size: $ft-siz-small;
     text-align: center;
   }
-
   .error {
     padding: .5rem 1rem 1rem;
     margin: -2rem 0 2rem;
@@ -119,7 +117,6 @@ form {
     color: $neutral-800;
     font-size: $ft-siz-small;
   }
-
   .miel {
     position: absolute;
     left: -9999px;
@@ -127,12 +124,6 @@ form {
     height: 1px;
     overflow: hidden;
   }
-
-  button {
-    padding: 1rem 2rem;
-    box-shadow: $shd-btn;
-  }
-
 }
 
 main dialog {
@@ -141,15 +132,21 @@ main dialog {
   height: 100%;
   border: 0;
   border-radius: $rounded-md;
+  padding: 0;
 
   .close-wrapper {
     width: 100%;
+    z-index: 30;
+    position: absolute;
+    top: 1.7rem;
+    right: 1.7rem;
     display: flex;
     align-items: flex-end;
-    justify-content: end;
+    justify-content: end;    
 
     button {
       background-color: transparent;
+      box-shadow: none;
       border: 0;
       padding: 0rem;
 
@@ -159,14 +156,35 @@ main dialog {
     }
   }
 
-  .panel-content {
+  .panel-content {        
+    height: 100%;
     h2 {
-      padding: 0;
+      padding: 1.7rem;
       margin-bottom: 1.5rem;
+      height: 10%;
     }
+    form{      
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: calc(90% - 2rem);
+      .drops{
+        padding-top: 10%;
+        .dropdown {
+          margin-bottom: 1.5rem;
+        }
+      }
+      .btn-group{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }    
 
-    .dropdown {
-      margin-bottom: 1.5rem;
-    }
+    
   }
+}
+
+p.center{
+  text-align: center;
 }
