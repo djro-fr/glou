@@ -10,6 +10,7 @@ Interactive map listing the 481 public drinking water fountains in Toulouse, bui
 - Client-side filtering: fountains are fetched once, filtered in the browser
 - Auto-zoom on the selected city or district
 - Toulouse selected by default
+- User geolocation: locate-me control in the filter bar, with live position tracking and accuracy circle
 
 ## Tech Stack
 
@@ -136,6 +137,7 @@ _Coming soon, once deployed._
 - The fountains CSV (`db/data/fontaines-a-boire.csv`) has been downloaded separately from [data.toulouse-metropole.fr](https://data.toulouse-metropole.fr/explore/dataset/fontaines-a-boire/) and placed in `db/data/`
 - Database schema and districts are auto-seeded on container start; fountains seed must be run manually
 - The seed script is idempotent (safe to re-run)
+- Geolocation requires a secure context: it works on `localhost` and over HTTPS, but not over plain HTTP (e.g. testing on a phone via the local network IP)
 
 ## Project structure
 
@@ -202,4 +204,4 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 
 ## Last update
 
-October 27, 2026
+November 17, 2026

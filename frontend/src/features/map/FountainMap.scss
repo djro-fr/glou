@@ -47,7 +47,7 @@ main.map-page{
       border-radius: 0 0 $rounded-sm $rounded-sm;    
     }    
     >.quartier{
-      padding: 0 1rem;
+      padding: 0 1rem 0 .5rem;
     }
     a{      
       height: 100%;         
@@ -62,6 +62,16 @@ main.map-page{
           transform: translateY(10px);
           color:$neutral-800;
           opacity: .4;
+        }
+      }
+    }
+    .loca-slot {
+      margin-left: $space-md;      
+      .maplibregl-ctrl-group {
+        background: transparent;
+        box-shadow: none;
+        .maplibregl-ctrl-geolocate{
+          box-shadow: none;
         }
       }
     }

@@ -118,7 +118,7 @@
 
   function getDisplayText(): string {
     if (loading) return 'Chargement...';
-    if (selected) return truncateText(selected.label, 35);
+    if (selected) return truncateText(selected.label, 28);
     if (hasInteracted) return clearLabel;
     return displayPlaceholder;
   }

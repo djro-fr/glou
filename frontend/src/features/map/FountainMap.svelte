@@ -1,9 +1,10 @@
 <script lang="ts">
-  import type {
-    Map,
-    GeoJSONSource,
-    MapMouseEvent,
-    MapGeoJSONFeature,
+  import {
+    type Map,
+    type GeoJSONSource,
+    type MapMouseEvent,
+    type MapGeoJSONFeature,
+    type GeolocateControl,
   } from "maplibre-gl";
 
   import type { Fountain } from "./types/fountain";
@@ -224,22 +225,32 @@
     );
   }
 
+  function locateUser() {
+    if (!geolocate?.trigger()) {
+      console.warn("Géolocalisation pas encore prête");
+    }
+  }
+
   let mapContainer: HTMLDivElement | undefined = $state();
   let map: Map | null = null;
   let fountains: Fountain[] = $state.raw([]);
   let selectedFountain: Fountain | null = $state(null);
   let filteredFountains = $derived(fountains.filter((f) => matchesFilters(f)));
+  let geolocate: GeolocateControl | null = null;
+  let locaSlot: HTMLDivElement | undefined = $state();
 
   $effect(() => {
     if (!mapContainer) return;
     let mapInstance: Map | null = null;
     let cancelled = false;
     async function initMap() {
-      const [{ Map: MapLibreMap, setWorkerUrl }, workerUrlModule] =
-        await Promise.all([
-          import("maplibre-gl"),
-          import("maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url"),
-        ]);
+      const [
+        { Map: MapLibreMap, GeolocateControl: MapLibreGeolocate, setWorkerUrl }, 
+        workerUrlModule,
+      ] = await Promise.all([
+        import("maplibre-gl"),
+        import("maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url"),
+      ]);
       await import("maplibre-gl/dist/maplibre-gl.css");
 
       if (cancelled || !mapContainer) return;
@@ -248,13 +259,21 @@
 
       mapInstance = new MapLibreMap({
         container: mapContainer,
-        style:
-          "https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json",
+        style: "https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json",
         center: [1.44, 43.6],
         fadeDuration: 0,
         zoom: 12,
       });
       map = mapInstance;
+
+      const control = new MapLibreGeolocate({        
+        trackUserLocation: true,                       
+        showAccuracyCircle: true,                      
+        fitBoundsOptions: { maxZoom: 16 },             
+      });                                              
+      const locaEl = control.onAdd(mapInstance);
+      locaSlot?.appendChild(locaEl);
+      geolocate = control;                             
 
       initFountainLayer(
         mapInstance,
@@ -265,8 +284,10 @@
     initMap();
     return () => {
       cancelled = true;
+      geolocate?.onRemove();
       mapInstance?.remove();
       map = null;
+      geolocate = null; 
     };
   });
 
@@ -297,7 +318,8 @@
     onClose={() => (selectedFountain = null)}
   />
 {/if}
-<div class="filter-bar">
+<div class="filter-bar">  
+  <div class="loca-slot" bind:this={locaSlot}></div>
   <DistrictFilter />
   <FilterPanel {fountains} />
 </div>
