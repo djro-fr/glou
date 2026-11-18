@@ -125,7 +125,7 @@ _Coming soon, once deployed._
    ```bash
       # Terminal 1: Start backend (port 3000)
       cd backend
-      npx tsx src/app.ts
+      npm run dev
 
       # Terminal 2: Frontend (port 5173 Vite dev server)
       cd frontend 
@@ -139,39 +139,67 @@ _Coming soon, once deployed._
 - The seed script is idempotent (safe to re-run)
 - Geolocation requires a secure context: it works on `localhost` and over HTTPS, but not over plain HTTP (e.g. testing on a phone via the local network IP)
 
+## Available scripts
+
+| Package | Script | Role |
+| --- | --- | --- |
+| `frontend/` | `dev` | Start the Vite dev server |
+| `frontend/` | `lint` | Lint the code (ESLint) |
+| `frontend/` | `check` | Type-check (svelte-check + tsc) |
+| `frontend/` | `build` | Generate tokens, type-check and build for production |
+| `frontend/` | `preview` | Preview the production build locally |
+| `frontend/` | `build-tokens` | Generate CSS/SCSS variables from design tokens |
+| `backend/` | `dev` | Start the dev server (tsx) |
+| `backend/` | `check` | Type-check (`tsc --noEmit`) |
+| `backend/` | `build` | Compile to `dist/` |
+| `backend/` | `start` | Run the compiled production server |
+| `db/` | `check` | Type-check the seed scripts |
+
 ## Project structure
 
 ```text
 .
+├── .github/workflows/ci.yml     # CI: lint, type-check, build (GitHub Actions)
 ├── docs/
 │   └── SPECIFICATIONS.md
 ├── db/
-│   ├── data/        # CSV sources, versioned
-│   ├── init/        # schema + districts seed (auto-run on first container start)
-│   └── scripts/     # seeds fountains
+│   ├── data/                    # CSV sources, versioned
+│   ├── init/                    # Schema + districts seed (auto-run on first container start)
+│   ├── scripts/                 # Seeds fountains
+│   └── tsconfig.json            # Extends ../tsconfig.base.json
+│    
 ├── backend/
-│   ├── config/      # env, database and transporter (smtp mail) configuration
-│   └── src/
-│       ├── Controller/   # HTTP request handling
-│       ├── Service/      # Business logic
-│       ├── Repository/   # Data access (PostgreSQL, SMTP)
-│       ├── DTO/          # Zod validation schemas
-│       └── Middleware/   # Global error handling
+│   ├── config/                  # Env, database and transporter (smtp mail) configuration
+│   ├── src/
+│   │   ├── Controller/          # HTTP request handling
+│   │   ├── Service/             # Business logic
+│   │   ├── Repository/          # Data access (PostgreSQL, SMTP)
+│   │   ├── DTO/                 # Zod validation schemas
+│   │   └── Middleware/          # Global error handling
+│   └── tsconfig.json            # Extends ../tsconfig.base.json
+│
 ├── frontend/
 │   ├── design-system/
-│   │   └── tokens.json      # Design tokens (Tokens Studio / DTCG format)
-│   ├── public/              # Static assets (fonts, icons, images, favicons)
-│   └── src/   
-│       ├── features/        # Feature-based structure
-│       │   ├── about/   
-│       │   ├── contact/   
-│       │   └── map/         # Fountain map with clustering, details panel & filters
-│       │       ├── types/   # Map feature TypeScript interfaces (district, fountain)
-│       │       └── *.svelte.ts  # Shared reactive state (filters, districts)
-│       ├── shared/          # Reusable components, helpers, layout, styles
-│       └── routes.ts        # Router configuration
-├── README.md
-└── [config files: tsconfig.json, vite.config.ts, etc.]
+│   │   └── tokens.json          # Design tokens (Tokens Studio / DTCG format)
+│   ├── public/                  # Static assets (fonts, icons, images, favicons)
+│   ├── src/   
+│   │   ├── features/            # Feature-based structure
+│   │   │   ├── about/   
+│   │   │   ├── contact/   
+│   │   │   └── map/             # Fountain map with clustering, details panel & filters
+│   │   │       ├── types/       # Map feature TypeScript interfaces (district, fountain)
+│   │   │       └── *.svelte.ts  # Shared reactive state (filters, districts)
+│   │   ├── shared/              # Reusable components, helpers, layout, styles
+│   │   └── routes.ts            # Router configuration
+│   ├── build-tokens.ts          # Generates tokens.css / tokens.scss from tokens.json
+│   ├── tsconfig.json            # Project references (app + node)
+│   ├── tsconfig.app.json        # Browser code (src/)
+│   └── tsconfig.node.json       # Node code (vite.config.ts)
+│
+├── .env.example                 # Environment variables template
+├── docker-compose.yml           # PostgreSQL service for local dev
+├── README.md                    # Project documentation
+└── tsconfig.base.json           # Shared TypeScript options (extended by backend/ and db/)
 ```
 
 ## Database
@@ -204,4 +232,4 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 
 ## Last update
 
-November 17, 2026
+November 18, 2026
