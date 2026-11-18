@@ -11,7 +11,14 @@ const envSchema = z.object({
   CONTACT_RECIPIENT: z.email(),
   SMTP_HOST: z.string().min(1),
   SMTP_PORT: z.coerce.number().int().min(1).max(65535),  
-  SMTP_PASS: z.string().min(1)
+  SMTP_PASS: z.string().min(1),
+  CORS_ORIGINS: z.string()
+  .transform((s) => s.split(',').map((o) => o.trim()).filter(Boolean))
+  .pipe(z.array(z.url()).min(1))
+  .refine(
+    (origins) => origins.every((o) => new URL(o).origin === o),
+    'Each origin must be scheme://host[:port], without path or trailing slash',
+  ),
 });
 
 export const env = envSchema.parse(process.env); 

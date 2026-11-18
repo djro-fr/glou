@@ -1,4 +1,5 @@
-import '../config/env.ts'
+import { env } from '../config/env.ts'
+
 import z from 'zod';
 z.config(z.locales.fr());
 
@@ -16,7 +17,7 @@ app.disable('x-powered-by');
 const port = 3000;
 
 app.use(cors({ 
-  origin: ['http://localhost:5173', 'http://localhost:4173']
+  origin: env.CORS_ORIGINS
 }));
 app.use(express.json());
 

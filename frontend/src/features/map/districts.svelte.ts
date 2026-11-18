@@ -18,7 +18,7 @@ export async function loadDistricts() {
   requested = true;
 
   try {
-    const response = await fetch('http://localhost:3000/districts');
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/districts`);
     if (!response.ok) throw new Error(`API error: ${response.status}`);
 
     const data: District[] = await response.json();

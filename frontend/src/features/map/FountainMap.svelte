@@ -199,7 +199,7 @@
     onFountainsLoaded: (fountains: Fountain[]) => void,
     onPinClick: (fountain: Fountain) => void,
   ) {
-    fetch("http://localhost:3000/fountains")
+    fetch(`${import.meta.env.VITE_API_URL}/fountains`)
       .then((res) => res.json())
       .then((fountains: Fountain[]) => {
         onFountainsLoaded(fountains);
