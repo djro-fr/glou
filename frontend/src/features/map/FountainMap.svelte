@@ -225,12 +225,6 @@
     );
   }
 
-  function locateUser() {
-    if (!geolocate?.trigger()) {
-      console.warn("Géolocalisation pas encore prête");
-    }
-  }
-
   let mapContainer: HTMLDivElement | undefined = $state();
   let map: Map | null = null;
   let fountains: Fountain[] = $state.raw([]);
@@ -272,6 +266,8 @@
         fitBoundsOptions: { maxZoom: 16 },             
       });                                              
       const locaEl = control.onAdd(mapInstance);
+      // MapLibre owns this element; locaSlot is empty in the template, so Svelte never manages its children
+      // eslint-disable-next-line svelte/no-dom-manipulating
       locaSlot?.appendChild(locaEl);
       geolocate = control;                             
 

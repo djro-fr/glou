@@ -2,8 +2,8 @@
   import { contactSchema } from './contactSchema';
 
   type Field = 'name' | 'email' | 'subject' | 'message';
-  type FieldError = { field: string | null; message: string };
-  type Status = 'idle' | 'sending' | 'success' | 'error';
+  type FieldError = { field: Field | null; message: string };
+  type Status = 'idle' | 'sending' | 'success';
   
   const fields: Field[] = ['name', 'email', 'subject', 'message'];
   const emptyForm = { name: '', email: '', subject: '', message: '', website: '' };
@@ -15,7 +15,7 @@
   let successMessage = $state('');
 
   const globalErrors = $derived(errors.filter(e => e.field === null));
-  const fieldError = (field: string) => errors.find(e => e.field === field)?.message;
+  const fieldError = (field: Field) => errors.find(e => e.field === field)?.message;
 
   function validateField(field: Field): boolean {
     const result = contactSchema.shape[field].safeParse(form[field]);
@@ -41,7 +41,7 @@
     fields.forEach(f => (touched[f] = true));
     const allValid = fields.map(validateField).every(Boolean);
     if (!allValid) {
-      status = 'error';
+      status = 'idle';
       const firstInvalid = fields.find(f => fieldError(f));
       if (firstInvalid) document.getElementById(firstInvalid)?.focus();
       return; 
@@ -59,7 +59,7 @@
 
       if (!res.ok) {
         errors = body?.errors ?? [{ field: null, message: 'Une erreur inattendue est survenue.' }];
-        status = 'error';
+        status = 'idle';
         return;
       }
 
@@ -69,7 +69,7 @@
       touched = {};
     } catch {
       errors = [{ field: null, message: 'Impossible de joindre le serveur. Vérifiez votre connexion.' }];
-      status = 'error';
+      status = 'idle';
     }
   }
 </script>
@@ -86,7 +86,7 @@
 
   <div class="field">
     <label for="email">E-mail</label>
-    <input id="email" type="email" bind:value={form.email} required maxlength="254"  placeholder="Votre adresse e--mail" autocomplete="email"
+    <input id="email" type="email" bind:value={form.email} required maxlength="254"  placeholder="Votre adresse e-mail" autocomplete="email"
       onblur={() => onBlur('email')} oninput={() => onInput('email')}
       aria-invalid={!!fieldError('email')} aria-describedby={fieldError('email') ? 'email-error' : undefined} />
     {#if fieldError('email')}<p id="email-error" class="error">{fieldError('email')}</p>{/if}
@@ -119,6 +119,6 @@
 
   <div role="status" aria-live="polite">
     {#if status === 'success'}<p class="success">{successMessage}</p>{/if}
-    {#each globalErrors as e}<p class="error">{e.message}</p>{/each}
+    {#each globalErrors as e (e.message)}<p class="error">{e.message}</p>{/each}
   </div>
 </form>
