@@ -1,4 +1,4 @@
-import type { District } from './types/district';
+import type { District } from './types/district.ts';
 
 export interface DropdownDistrict extends District {
   id: number;

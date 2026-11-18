@@ -8,6 +8,12 @@
     "pg": "^8.23.0",
     "zod": "^4.6.5"
   },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "dev":"tsx src/app.ts",
+    "start": "node dist/src/app.js"
+  },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",

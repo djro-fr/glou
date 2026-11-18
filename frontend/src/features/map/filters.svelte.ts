@@ -1,4 +1,4 @@
-import type { Fountain } from './types/fountain';
+import type { Fountain } from './types/fountain.ts';
 
 export const DEFAULT_CITY = "Toulouse";
 
