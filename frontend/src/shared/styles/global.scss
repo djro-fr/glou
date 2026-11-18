@@ -12,6 +12,7 @@ button {
   font-size: $ft-siz-medium;
   padding: 1rem 2rem;
   box-shadow: $shd-btn;
+  cursor: pointer;
   &.primary{    
     padding: 1rem 2rem;
     background-color: $primary-500;    
@@ -56,7 +57,7 @@ button {
 
 form {
   font-family: $family-text;
-  padding: 1rem 2rem 2rem;
+  padding: 1rem 2rem 2rem;  
   .field {
     label {
       display: block;
@@ -129,10 +130,13 @@ form {
 main dialog {
   z-index: 2;
   width: 100%;
+  max-width: 360px;
   height: 100%;
+  max-height: 600px;
   border: 0;
   border-radius: $rounded-md;
   padding: 0;
+  box-shadow: $shd-overlay;
 
   .close-wrapper {
     width: 100%;
@@ -142,9 +146,10 @@ main dialog {
     right: 1.7rem;
     display: flex;
     align-items: flex-end;
-    justify-content: end;    
+    justify-content: end;       
 
     button {
+      cursor: pointer;
       background-color: transparent;
       box-shadow: none;
       border: 0;
