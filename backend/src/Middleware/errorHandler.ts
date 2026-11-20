@@ -4,5 +4,8 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
   if (res.headersSent) {
     return next(err);
   }
-  res.status(500).json({ error: err.message });
+  console.error('Erreur serveur non gérée :', err);
+  res.status(500).json({
+    errors: [{ field: null, message: 'Une erreur interne est survenue. Merci de réessayer plus tard.' }],
+  });
 }
