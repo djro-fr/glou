@@ -32,6 +32,14 @@ Interactive map listing the 481 public drinking water fountains in Toulouse, bui
 
 The full spec (context, user stories, data model, architecture, API endpoints, definition of done) is available in [`docs/SPECIFICATIONS.md`](docs/SPECIFICATIONS.md).
 
+## Development and AI
+
+- v0: designed and coded by me. Claude (chat) served as my assistant to learn Node/Express, debug, and validate my modeling choices.
+
+- v1: developed with Claude Code (AI agent): CI/CD pipeline, tests, PostGIS proximity search. My role: plan each step, proofread and correct the proposed code, write or validate tests.
+
+What I take away from this: ...
+
 ## Design tokens
 
 Tokens are defined in [`frontend/design-system/tokens.json`](frontend/design-system/tokens.json) (Tokens Studio / DTCG format) and transformed into CSS and SCSS variables via Style Dictionary.
@@ -232,4 +240,4 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 
 ## Last update
 
-November 18, 2026
+November 20, 2026

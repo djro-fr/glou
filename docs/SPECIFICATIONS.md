@@ -6,7 +6,7 @@
 
 **Target audience:** residents and visitors of Toulouse looking to locate a drinking water fountain.
 
-**Data source:** [data.toulouse-metropole.fr, Fontaines à boire](https://data.toulouse-metropole.fr/explore/dataset/fontaines-a-boire/) (~480 entries).
+**Data source:** [data.toulouse-metropole.fr, Fontaines à boire](https://data.toulouse-metropole.fr/explore/dataset/fontaines-a-boire/) (481 entries, 38 of which have no district assigned in the source data: 35 in Toulouse, 3 in Tournefeuille).
 
 ---
 
@@ -20,7 +20,7 @@
   As a visitor, I want to see all fountains in Toulouse on a map as soon as I land on the site, so I get a general view without any action on my part.
 
 2. **US2, Readability at large scale**
-  As a visitor, I want nearby fountains to be visually grouped (clusters), so I'm not overwhelmed by 480 overlapping points.
+  As a visitor, I want nearby fountains to be visually grouped (clusters), so I'm not overwhelmed by 481 overlapping points.
 
 3. **US3, Zooming into a cluster**
   As a visitor, I want to click a cluster to zoom in and see the fountains it contains spread out, so I can explore a specific area.
@@ -32,7 +32,7 @@
   As a visitor, I want to filter fountains by type (BAYARD, PRESTO, AUTRE, WATER CONNECT), so I can find a specific model if needed.
 
 6. **US6, Filter by status**
-  As a visitor, I want to filter fountains by status (open, etc.), so I can avoid closed or out-of-service fountains.
+  As a visitor, I want to filter fountains by status, so I can avoid closed or out-of-service fountains.
 
 7. **US7, View fountain details**
   As a visitor, I want to click a marker to see its address, type and status, so I know exactly where to go and what to expect.
@@ -47,35 +47,47 @@
   As a visitor, I want to be able to contact the developer, so I can ask questions or propose partnerships.
 
 11. **US11, Filter by city**
-  As a visitor, I want to be able to search by city or district, so I can quickly narrow down results.
+  As a visitor, I want to filter fountains by city, so I can quickly narrow down results outside Toulouse.
+
+12. **US12, Locate myself**
+  As a visitor, I want to see my position on the map, so I can spot the fountains around me.
 
 ---
 
 ## 3. Features, Version 1 (MVP)
 
 - Interactive map as the **only** view of the application (no table/list view)
-- Default behavior (no active filter): display all 480 fountains, on a view covering the whole city of Toulouse
+- Default behavior: city filter preset to Toulouse, map covering the whole city
 - Marker **clustering** (natively via MapLibre, GeoJSON source + built-in clustering) for readability depending on zoom level
 - Differentiated visual representation of **markers**:
   - Standalone fountain: pin with a color dot based on status
   - Cluster of fountains: numbered round badge
 - **Filters**, positioned at the bottom of the screen (thumb-accessible zone, mobile-first approach):
-  - District: accessible as a quick filter via a dropdown, also editable from the filter panel (both stay synced). Disabled by default until a city is selected, or if the selected city isn't Toulouse.
-  - City, Type and Status: available in the filter panel, opened via the "Filter" button. Bidirectional dependency between City and District: selecting one filters the available options in the other (e.g. choosing a city restricts the district list to that city's; choosing a district auto-fills its city). If City is not Toulouse, District is disabled.
-  - When a District or City filter is applied, the map automatically recenters and zooms to the matching area
+  - **Client-side filtering**: fountains are loaded once from the API and filtered in the frontend (small dataset, ~481 entries)
+  - District: quick filter via a dropdown in the bottom bar, also editable from the filter panel (both stay synced through a shared Svelte 5 runes store, `filters.svelte.ts`). Enabled only when the selected city is Toulouse (the "Quartiers de proximité" dataset covers Toulouse only).
+  - City, Type and Status: available in the filter panel (bottom sheet built on a native `<dialog>` + `showModal()`), opened via the "Filter" button
+  - Business rule: a selected district always implies city = Toulouse (choosing a district sets the city; choosing another city clears the district)
+  - **Faceted filtering**: each dropdown only shows options that still have matching fountains given the other active filters
+  - Live count of matching fountains; the "Validate" button is disabled when the count is 0
+  - "Cancel" resets all filters
+  - When a District or City filter is applied, the map automatically recenters and zooms to the matching area (`fitBounds` on the bounding box of matching fountains)
   - Filters remain combinable with each other (US8)
+- **User geolocation (US12)**: MapLibre `GeolocateControl`, mounted in the filter bar (left of the district dropdown) instead of a map corner. Requires a secure context (HTTPS or localhost).
 - **Fountain details (US7)**, shown on marker click: ID, type, city, district, location, address, status
 - About page: project presentation (context, objective, tech stack) and short bio
 - Contact page: form (name, email, subject, message) sent via a dedicated backend (Nodemailer)
-- Server-side field validation (valid email, required fields)
-- Basic anti-spam measure planned (simple honeypot)
-- Client-side routing added (@keenmate/svelte-spa-router) to navigate between the map, About and Contact
+  - Validation on both sides with aligned Zod schemas (trim, max lengths, no line breaks in subject)
+  - Live client-side validation (on blur/input) + submit-time validation, focus moved to the first invalid field
+  - Accessible markup (`aria-invalid`, `aria-describedby`, `aria-live`)
+  - Honeypot anti-spam field (hidden off-screen, not `display: none`); the honeypot response is identical to a success response
+  - Email sent in plain text, `from` = site address, `replyTo` = visitor's email (SPF/DMARC compliance)
+- Client-side routing (@keenmate/svelte-spa-router, history mode) to navigate between the map, About and Contact
 
 ---
 
 ## 4. Out of scope for V1 (explicitly excluded, to keep scope in check)
 
-- User geolocation / proximity search (would require PostGIS) → planned for V2
+- Proximity search / sorting fountains by distance (would require PostGIS) → planned for V2
 - User authentication
 - User reviews, ratings, or contributions
 - Filtering by `territory` (data kept in the database but not used in V1)
@@ -84,7 +96,7 @@
 
 ## 5. Data model
 
-Two tables, related through a reference table of districts (cross-referencing the fountains dataset with Toulouse Métropole's official "Quartiers de proximité" dataset, to get district names from their numbers).
+Two tables: `fountain`, and a reference table `district` (cross-referencing the fountains dataset with Toulouse Métropole's official "Quartiers de proximité" dataset, to get district names from their numbers).
 
 ```sql
 CREATE TABLE district (
@@ -102,13 +114,15 @@ CREATE TABLE fountain (
   latitude          DOUBLE PRECISION NOT NULL,
   longitude         DOUBLE PRECISION NOT NULL,
   created_at        TIMESTAMP DEFAULT NOW(),
-  district_number   INTEGER REFERENCES district(number_d)
+  district_number   INTEGER REFERENCES district(number_d)   -- nullable: 38 fountains have no district
 );
 
 CREATE INDEX idx_fountain_district ON fountain(district_number);
 CREATE INDEX idx_fountain_type_f ON fountain(type_f);
 CREATE INDEX idx_fountain_status ON fountain(status_f);
 ```
+
+Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without a district are not dropped.
 
 **Source dataset fields not carried over:**
 
@@ -121,25 +135,28 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 | Layer | Tech |
 | --- | --- |
-| Frontend | Svelte 5 + TypeScript + MapLibre GL JS + clustering via MapLibre (GeoJSON source + built-in clustering) + SCSS |
+| Frontend | Svelte 5 (runes) + TypeScript + Vite + MapLibre GL JS + SCSS |
 | Basemap | Positron style via openmaptiles.geo.data.gouv.fr (Etalab, free, OSM-based) |
-| Backend | Node.js + Express |
-| Database | PostgreSQL (no PostGIS extension in V1) |
+| Backend | Node.js + Express + TypeScript, Controller / Service / Repository layers (inspired by hexagonal / clean architecture) |
+| Database | PostgreSQL (no PostGIS extension in V1), `pg` driver |
 | CI | GitHub Actions |
 | CD | Deployment on a dedicated VPS |
 | Containerization | Docker Compose (frontend, backend, PostgreSQL) |
 
-- Design tokens pipeline: Tokens Studio (Figma) → DTCG format (tokens.json) → Style Dictionary (@tokens-studio/sd-transforms) → CSS custom properties (tokens.css)
-- Clustering: Native MapLibre GL JS with GeoJSON source
-- Lazy-loaded MapLibre GL JS to optimize mobile LCP
+- Monorepo: `frontend/`, `backend/`, `db/`, each with its own `package.json`; shared `tsconfig.base.json` extended by `backend/` and `db/`
+- Single `.env` at the repository root (PostgreSQL, SMTP, `CORS_ORIGINS`, `VITE_API_URL`), read by Vite via `envDir`
+- Backend environment variables validated at startup with Zod (`backend/config/env.ts`); CORS origins configurable via `CORS_ORIGINS`
+- The frontend build fails if `VITE_API_URL` is missing (check in `vite.config.ts`)
+- Design tokens pipeline: Tokens Studio (Figma) → DTCG format (tokens.json) → Style Dictionary (@tokens-studio/sd-transforms) → `tokens.css` (CSS custom properties, also read by MapLibre layer styling via `getComputedStyle()`) + `tokens.scss` (Sass variables for compile-time use)
+- Clustering: native MapLibre GL JS with GeoJSON source
+- MapLibre GL JS lazy-loaded (dynamic import) to optimize mobile LCP
 - Routing: @keenmate/svelte-spa-router (history mode)
-- Contact: `POST /contact` route on the Express backend, sent via Nodemailer (SMTP provider TBD, Gmail, OVH, or another option depending on what's already available on your domain)
-- Basic anti-spam measure planned (simple honeypot)
-- Font: Self-hosted Ubuntu (no external CDN, non-render-blocking via media queries)
+- Contact: `POST /contact` route on the Express backend, sent via Nodemailer over SMTP (`secure` derived from the port: 465 vs 587; `transporter.verify()` called at startup)
+- Font: self-hosted Ubuntu (woff2, no external CDN), preloaded and loaded non-render-blocking (`media="print"` swap)
 
 ### Error handling & validation
 
-- Backend input validation uses Zod (typed schemas, localized error messages).
+- Backend input validation uses Zod (`safeParse`, errors returned as an array of `{ field, message }` objects for per-field display).
 - A global Express error-handling middleware and dedicated PostgreSQL connection resilience (startup and runtime failures) ensure the API stays available and returns clear, structured error responses.
 
 ---
@@ -148,37 +165,41 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 | Method | Route | Description |
 | --- | --- | --- |
-| GET | `/fountains` | List all fountains |
+| GET | `/fountains` | List all fountains (with district name, `LEFT JOIN`) |
 | GET | `/fountains/:id` | Fountain detail |
-| GET | `/fountains?city=X&district=Y&type=Z&status=W` | Filtered fountains |
 | GET | `/districts` | List of districts (id + name) |
 | POST | `/contact` | Send the contact form (name, email, subject, message) |
+
+Filtering is done client-side, so no filtered endpoint is used in V1.
 
 ---
 
 ## 8. CI/CD & Deployment
 
-**CI (GitHub Actions), triggered on push/PR:**
+**CI (GitHub Actions, `ci.yml`), triggered on push/PR:**
 
-- Lint (ESLint)
-- Tests (if written)
-- Build (frontend + backend)
-- SonarQube for IDE checks (code quality)
+- Three jobs running in parallel: `db`, `backend`, `frontend`
+- Each job: `npm ci` + lint (ESLint) + type check + build (10-minute timeout per job)
+- Tests: Vitest (planned)
+- Code quality checked locally in the editor with SonarQube for IDE (not part of the pipeline)
 
-**CD, triggered on push to `main`:**
+**CD, triggered on push to `main` (to do):**
 
-- SSH connection to the dedicated VPS
-- Deployment via Docker Compose
+- Dockerfiles for frontend and backend + `docker-compose.prod.yml`
+- Deploy job using a GitHub `production` environment (real `VITE_API_URL`)
+- SSH connection to the dedicated VPS, deployment via Docker Compose
 
 **VPS security (set up from the start, based on lessons learned from the Breco project):**
 
-- Dedicated ED25519 SSH key (no password)
+- Dedicated ED25519 SSH key for deployment; password authentication disabled
 - Fail2ban installed
 - Firewall (UFW) configured restrictively
 
 ---
 
 ## 9. Performance & Metrics
+
+Lighthouse mobile, measured on September 26, 2026, right after the Svelte migration (before the filter panel, contact form and geolocation). To be re-measured on the production deployment.
 
 - Lighthouse mobile: 89/100
 - First Contentful Paint (FCP): 2.4s
@@ -193,29 +214,39 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 - [x] Navigation between the 3 pages (map/About/Contact) working
 - [x] About page accessible and up to date
-- [x] Functional map displaying all ~480 fountains with clustering
-- [x] Filters (city, district, type, status) working, with bidirectional city/district dependency
+- [x] Functional map displaying all 481 fountains with clustering
+- [x] Filters (city, district, type, status) working, with city/district dependency and faceted options
 - [x] Fountain details accessible on click
 - [x] Functional backend API connected to PostgreSQL
-- [ ] Passing CI pipeline (lint, build)
+- [x] Passing CI pipeline (lint, type check, build)
+- [x] Working contact form (submission + validation + visual feedback to the user)
+- [ ] Fix `.env` path resolution in the compiled backend
+- [ ] Dockerfiles + `docker-compose.prod.yml`
 - [ ] Live deployment on the VPS, application accessible online
-- [ ] Working contact form (submission + validation + visual feedback to the user)
 - [ ] Complete README (context, stack, installation, screenshots)
 
 ---
 
-## 11. V2 ideas
+## 11. Known limitations
+
+- 38 fountains have no district in the source data: they are displayed on the map but can't be matched by the district filter.
+- The "Quartiers de proximité" dataset only covers the Toulouse commune: no district filtering for other cities.
+
+---
+
+## 12. V2 ideas
 
 ### High priority
 
-- **User geolocation + proximity search**: Display fountains sorted by distance from user location. Enable address/street search (geocoding via API Adresse or Nominatim) to combine with geolocation. Requires PostGIS for spatial queries.
-- **Status updates**: Allow users to update fountain status (open/closed) with timestamp tracking
-- **Accessibility audit & improvements**: Full ARIA validation, keyboard navigation testing, screen reader compatibility
-- **SEO optimization**: Meta tags, structured data (Schema.org), Open Graph, sitemap, robots.txt
+- **Proximity search**: display fountains sorted by distance from the user's location. Enable address/street search (geocoding via API Adresse or Nominatim). Requires PostGIS for spatial queries.
+- **District detection from geolocation**: point-in-polygon test against district boundaries ("Quartiers de proximité" contours, Turf.js `booleanPointInPolygon` in the backend Repository layer, then PostGIS). Would also allow assigning a district to the 38 fountains missing one.
+- **Status updates**: allow users to update fountain status (open/closed) with timestamp tracking
+- **Accessibility audit & improvements**: full ARIA validation, keyboard navigation testing, screen reader compatibility
+- **SEO optimization**: meta tags, structured data (Schema.org), Open Graph, sitemap, robots.txt
 
 ### Medium priority
 
-- **Fountain photos**: Add square photo storage and display in fountain details panel
+- **Fountain photos**: add square photo storage and display in the fountain details panel
 
 ### Lower priority
 
@@ -223,4 +254,4 @@ CREATE INDEX idx_fountain_status ON fountain(status_f);
 
 ## Last update
 
-September 26, 2026
+November 20, 2026

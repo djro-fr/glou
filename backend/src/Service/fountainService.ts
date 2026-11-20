@@ -1,27 +1,28 @@
 import type { FountainFilters } from '../DTO/fountainFilters.ts';
 import {getAllFountains, getFountainById} from '../Repository/fountainRepository.ts'
 
+const COLUMNS: Record<keyof FountainFilters, string> = {
+  city: 'f.city',
+  district: 'f.district_number',
+  type: 'f.type_f',
+  status: 'f.status_f'
+};
+
 export async function getAllFountainsService(filters: FountainFilters){     
-  let conditions: string[] = [];
-  let values: string[] = [];
+  const conditions: Array<string> = [];
+  const values: Array<string | number> = [];
   
   for (const [key, value] of Object.entries(filters)) {
-    if (typeof value === 'string') {
+    if (value !== undefined) {
       values.push(value);
-      conditions.push(`${key} = $${values.length}`);
+      conditions.push(`${COLUMNS[key as keyof FountainFilters]} = $${values.length}`);
     }
   }
     
-  let listConditions = "";
-  
-  for(let i=0; i < conditions.length; i++){    
-    if (i===0){
-      listConditions += ` WHERE ${conditions[i]}`;
-    } else {
-      listConditions += ` AND ${conditions[i]}`;
-    }     
-  }  
-  return await getAllFountains(listConditions, values);    
+  const where = conditions.length > 0
+    ? ` WHERE ${conditions.join(' AND ')}`     
+    : '';
+  return await getAllFountains(where, values);    
 }
 
 export async function getFountainByIdService(id:number){     
