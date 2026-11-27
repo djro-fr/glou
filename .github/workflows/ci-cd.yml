@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -68,3 +68,46 @@ jobs:
       - run: npm run build
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
+
+  # Deploys to the VPS on push to main, only if the three CI jobs pass.
+  # Secrets live in the `production` environment (restricted to main).
+  # The SSH key can only run /opt/glou/deploy/deploy.sh (forced command in authorized_keys).
+  deploy:
+    needs: [db, backend, frontend]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://glou.sylys.dev
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Deploy
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        # -T: no terminal (the key is restricted with no-pty); the forced command runs deploy.sh
+        run: >
+          ssh -T -i ~/.ssh/deploy_key -p "$SSH_PORT"
+          -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20
+          "$SSH_USER@$SSH_HOST"
+
+      - name: Smoke test
+        run: curl -fsS --retry 10 --retry-delay 6 --retry-all-errors https://glou.sylys.dev/api/health
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
