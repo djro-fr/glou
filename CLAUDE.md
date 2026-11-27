@@ -36,7 +36,9 @@ docker compose -f docker-compose.prod.yml run --rm seed
 
 Production (`docker-compose.prod.yml`): Caddy (`frontend/Dockerfile` + `frontend/Caddyfile`) is the only service publishing ports (80/443, overridable with `HTTP_PORT`/`HTTPS_PORT`); it serves the SPA, proxies `/api/*` to `backend:3000` (prefix stripped), handles HTTPS and sets the security headers (CSP, HSTS, Permissions-Policy). Backend and Postgres stay on the internal network: never add `ports:` to them (Docker bypasses UFW). The frontend image is built with `VITE_API_URL=/api` (relative). Dockerfiles build from the repo root (`tsconfig.base.json`); `.dockerignore` keeps `.env` out of images. If the frontend loads a new external host or inline script, update the CSP in the Caddyfile.
 
-What CI runs (`.github/workflows/ci.yml`, three parallel jobs, Node 24); run the same before considering work done:
+Deployment: every push to `main` that passes CI runs the `deploy` job, which SSHes to the VPS (`glou.sylys.dev`) as `deploy`; the key's forced command runs `deploy/deploy.sh` (`git pull --ff-only` in `/opt/glou`, `up -d --build --wait`, image prune), then the job curls `/api/health`. Keep `deploy.sh` LF-only (`.gitattributes`) and wrapped in `main()`, since `git pull` can rewrite it mid-run. The VPS `.env` and the GitHub `production` secrets are managed by hand, never in the repo.
+
+What CI runs (`.github/workflows/ci-cd.yml`, three parallel jobs, Node 24, then a `deploy` job on push to `main`); run the same before considering work done:
 
 - `db/`: `npm run check`
 - `backend/`: `npm run check`, `npm run build`
