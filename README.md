@@ -136,7 +136,7 @@ _Coming soon, once deployed._
       npm run dev
 
       # Terminal 2: Frontend (port 5173 Vite dev server)
-      cd frontend 
+      cd frontend
       npm run dev
    ```
 
@@ -163,19 +163,24 @@ _Coming soon, once deployed._
 | `backend/` | `start` | Run the compiled production server |
 | `db/` | `check` | Type-check the seed scripts |
 
+## API tests (Postman)
+
+The API is tested with a Postman collection: [`docs/postman/GLOU.postman_collection.json`](docs/postman/GLOU.postman_collection.json). Requests are grouped by expected status code (200, 400, 404). Each request checks the status code and the response body: the shape of the data, that filters are applied, and the shared error format `{ errors: [{ field, message }] }`. To run it, start the database and the backend (steps 4 to 6 above), import the collection into Postman and run it with the Collection Runner. The `baseUrl` collection variable defaults to `http://localhost:3000`. Leave the **Manual** folder unchecked: its request sends a real email through the contact form.
+
 ## Project structure
 
 ```text
 .
 ├── .github/workflows/ci.yml     # CI: lint, type-check, build (GitHub Actions)
 ├── docs/
+│   ├── postman/                 # Postman collection (API tests)
 │   └── SPECIFICATIONS.md
 ├── db/
 │   ├── data/                    # CSV sources, versioned
 │   ├── init/                    # Schema + districts seed (auto-run on first container start)
 │   ├── scripts/                 # Seeds fountains
 │   └── tsconfig.json            # Extends ../tsconfig.base.json
-│    
+│
 ├── backend/
 │   ├── config/                  # Env, database and transporter (smtp mail) configuration
 │   ├── src/
@@ -190,10 +195,10 @@ _Coming soon, once deployed._
 │   ├── design-system/
 │   │   └── tokens.json          # Design tokens (Tokens Studio / DTCG format)
 │   ├── public/                  # Static assets (fonts, icons, images, favicons)
-│   ├── src/   
+│   ├── src/
 │   │   ├── features/            # Feature-based structure
-│   │   │   ├── about/   
-│   │   │   ├── contact/   
+│   │   │   ├── about/
+│   │   │   ├── contact/
 │   │   │   └── map/             # Fountain map with clustering, details panel & filters
 │   │   │       ├── types/       # Map feature TypeScript interfaces (district, fountain)
 │   │   │       └── *.svelte.ts  # Shared reactive state (filters, districts)

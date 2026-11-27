@@ -161,7 +161,8 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 ### Error handling & validation
 
 - Backend input validation uses Zod (`safeParse`). Validation errors return **400** with a shared format: `{ errors: [{ field, message }] }`. `/fountains` query params use a strict schema: unknown params are rejected.
-- A global Express error-handling middleware logs the full error server-side and returns a generic **500** message in the same format, without exposing internal details. Dedicated PostgreSQL connection resilience handles startup and runtime failures.
+- A global Express error-handling middleware logs the full error server-side and returns a generic **500** message in the same format, without exposing internal details.
+- PostgreSQL connection: the server exits at startup if the database is unreachable (`process.exit(1)`); runtime connection errors are logged, and the affected requests return a generic 500.
 - Frontend: API responses are checked (`response.ok`) before use; loading failures are shown as a toast and logged in the console.
 
 ---
@@ -172,7 +173,7 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 | --- | --- | --- |
 | GET | `/fountains` | List all fountains (with district name, `LEFT JOIN`) |
 | GET | `/fountains?city=X&district=Y&type=Z&status=W` | Filtered fountains (validated query params; not used by the frontend) |
-| GET | `/fountains/:id` | Fountain detail (not used by the frontend) |
+| GET | `/fountains/:id` | Fountain detail as a single object; 400 if the id is not a positive integer, 404 if not found (not used by the frontend) |
 | GET | `/districts` | List of districts (id + name) |
 | POST | `/contact` | Send the contact form (name, email, subject, message) |
 
@@ -187,6 +188,7 @@ Filtering is done client-side in the frontend (small dataset). The server-side f
 - Three jobs running in parallel: `db`, `backend`, `frontend`
 - Each job: `npm ci` + lint (ESLint) + type check + build (10-minute timeout per job)
 - Tests: Vitest (planned)
+- API tests: Postman collection (`docs/postman/GLOU.postman_collection.json`), run manually with the Collection Runner (not part of the pipeline)
 - Code quality checked locally in the editor with SonarQube for IDE (not part of the pipeline)
 
 **CD, triggered on push to `main` (to do):**
@@ -226,7 +228,7 @@ Lighthouse mobile, measured locally on September 26, 2026, right after the Svelt
 - [x] Functional backend API connected to PostgreSQL
 - [x] Passing CI pipeline (lint, type check, build)
 - [x] Working contact form (submission + validation + visual feedback to the user)
-- [ ] Validate `/fountains/:id` (400 on invalid id, 404 when not found, single object instead of an array)
+- [x] Validate `/fountains/:id` (400 on invalid id, 404 when not found, single object instead of an array)
 - [ ] Fix `.env` path resolution in the compiled backend
 - [ ] Dockerfiles + `docker-compose.prod.yml`
 - [ ] Live deployment on the VPS, application accessible online

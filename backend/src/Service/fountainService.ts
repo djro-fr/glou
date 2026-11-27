@@ -1,4 +1,5 @@
 import type { FountainFilters } from '../DTO/fountainFilters.ts';
+import type { FountainId } from '../DTO/fountainId.ts';
 import {getAllFountains, getFountainById} from '../Repository/fountainRepository.ts'
 
 const COLUMNS: Record<keyof FountainFilters, string> = {
@@ -25,6 +26,6 @@ export async function getAllFountainsService(filters: FountainFilters){
   return await getAllFountains(where, values);    
 }
 
-export async function getFountainByIdService(id:number){     
+export async function getFountainByIdService(id: FountainId['id']){
   return await getFountainById(id);    
 }
