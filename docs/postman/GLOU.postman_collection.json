@@ -1,0 +1,838 @@
+{
+  "info": {
+    "_postman_id": "27392dc2-85ae-46f4-82a1-36fd4602009c",
+    "name": "GLOU",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "200 OK",
+      "item": [
+        {
+          "name": "/fountains",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test(\"renvoie les 481 fontaines\", () => {",
+                  "  pm.expect(data).to.be.an(\"array\").with.lengthOf(481);",
+                  "});",
+                  "pm.test(\"chaque fontaine a les champs attendus\", () => {",
+                  "  pm.expect(data[0]).to.include.all.keys(\"id\", \"location_f\", \"type_f\", \"address_f\", \"city\", \"status_f\", \"latitude\", \"longitude\", \"district_number\", \"name_d\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains/2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test(\"renvoie un objet, pas un tableau\", () => {",
+                  "  pm.expect(data).to.be.an(\"object\").and.not.an(\"array\");",
+                  "});",
+                  "pm.test(\"renvoie la fontaine 2 avec son quartier\", () => {",
+                  "  pm.expect(data.id).to.equal(2);",
+                  "  pm.expect(data).to.have.property(\"name_d\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains/2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains?city=Toulouse",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test(\"toutes les fontaines sont à Toulouse\", () => {",
+                  "  pm.expect(data).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(data.every((f) => f.city === \"Toulouse\")).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains?city=Toulouse",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains"
+              ],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "Toulouse"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains?type=BAYARD",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test(\"toutes les fontaines sont de type BAYARD\", () => {",
+                  "  pm.expect(data).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(data.every((f) => f.type_f === \"BAYARD\")).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains?type=BAYARD",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "BAYARD"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains?status=Ouverte",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test(\"toutes les fontaines sont ouvertes\", () => {",
+                  "  pm.expect(data).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(data.every((f) => f.status_f === \"Ouverte\")).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains?status=Ouverte",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Ouverte"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains?district=15",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test(\"toutes les fontaines sont dans le quartier 15\", () => {",
+                  "  pm.expect(data).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(data.every((f) => f.district_number === 15)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains?district=15",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains"
+              ],
+              "query": [
+                {
+                  "key": "district",
+                  "value": "15"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains?status=Ouverte&district=15",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test(\"les deux filtres sont appliqués\", () => {",
+                  "  pm.expect(data).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(data.every((f) => f.status_f === \"Ouverte\" && f.district_number === 15)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains?status=Ouverte&district=15",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Ouverte"
+                },
+                {
+                  "key": "district",
+                  "value": "15"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/districts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test(\"renvoie la liste des quartiers\", () => {",
+                  "  pm.expect(data).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(data[0]).to.include.all.keys(\"number_d\", \"name_d\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/districts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "districts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/contact (honeypot website rempli, aucun e-mail envoyé)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"réponse de succès factice\", () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Postman\",\n  \"email\": \"test@example.com\",\n  \"subject\": \"Test depuis Postman\",\n  \"message\": \"Ceci est un message de test envoyé depuis Postman.\",\n  \"website\": \"http://spam.example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/contact",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contact"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"répond 200\", () => {",
+              "  pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 Bad Request",
+      "item": [
+        {
+          "name": "/fountains/abc (pas un nombre)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const { errors } = pm.response.json();",
+                  "pm.test(\"erreur(s) sur id\", () => {",
+                  "  pm.expect(errors.map((e) => e.field)).to.have.members([\"id\"]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains",
+                "abc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains/0 (pas positif)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const { errors } = pm.response.json();",
+                  "pm.test(\"erreur(s) sur id\", () => {",
+                  "  pm.expect(errors.map((e) => e.field)).to.have.members([\"id\"]);",
+                  "});",
+                  "pm.test(\"message contient « positif »\", () => {",
+                  "  pm.expect(errors.some((e) => e.message.includes(\"positif\"))).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains/0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains",
+                "0"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains/-3 (négatif)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const { errors } = pm.response.json();",
+                  "pm.test(\"erreur(s) sur id\", () => {",
+                  "  pm.expect(errors.map((e) => e.field)).to.have.members([\"id\"]);",
+                  "});",
+                  "pm.test(\"message contient « positif »\", () => {",
+                  "  pm.expect(errors.some((e) => e.message.includes(\"positif\"))).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains/-3",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains",
+                "-3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains/1.5 (pas entier)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const { errors } = pm.response.json();",
+                  "pm.test(\"erreur(s) sur id\", () => {",
+                  "  pm.expect(errors.map((e) => e.field)).to.have.members([\"id\"]);",
+                  "});",
+                  "pm.test(\"message contient « entier »\", () => {",
+                  "  pm.expect(errors.some((e) => e.message.includes(\"entier\"))).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains/1.5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains",
+                "1.5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains/99999999999 (dépasse le max INTEGER Postgres)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const { errors } = pm.response.json();",
+                  "pm.test(\"erreur(s) sur id\", () => {",
+                  "  pm.expect(errors.map((e) => e.field)).to.have.members([\"id\"]);",
+                  "});",
+                  "pm.test(\"message contient « trop grand »\", () => {",
+                  "  pm.expect(errors.some((e) => e.message.includes(\"trop grand\"))).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains/99999999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains",
+                "99999999999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains/9999999999999999 (au-delà de Number.MAX_SAFE_INTEGER)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const { errors } = pm.response.json();",
+                  "pm.test(\"erreur(s) sur id, id\", () => {",
+                  "  pm.expect(errors.map((e) => e.field)).to.have.members([\"id\",\"id\"]);",
+                  "});",
+                  "pm.test(\"message contient « entier »\", () => {",
+                  "  pm.expect(errors.some((e) => e.message.includes(\"entier\"))).to.be.true;",
+                  "});",
+                  "pm.test(\"message contient « trop grand »\", () => {",
+                  "  pm.expect(errors.some((e) => e.message.includes(\"trop grand\"))).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains/9999999999999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains",
+                "9999999999999999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains?district=abc",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const { errors } = pm.response.json();",
+                  "pm.test(\"erreur(s) sur district\", () => {",
+                  "  pm.expect(errors.map((e) => e.field)).to.have.members([\"district\"]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains?district=abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains"
+              ],
+              "query": [
+                {
+                  "key": "district",
+                  "value": "abc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains?district=0",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const { errors } = pm.response.json();",
+                  "pm.test(\"erreur(s) sur district\", () => {",
+                  "  pm.expect(errors.map((e) => e.field)).to.have.members([\"district\"]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains?district=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains"
+              ],
+              "query": [
+                {
+                  "key": "district",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/fountains?type_f=BAYARD (paramètre inconnu)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const { errors } = pm.response.json();",
+                  "pm.test(\"erreur(s) sur null\", () => {",
+                  "  pm.expect(errors.map((e) => e.field)).to.have.members([null]);",
+                  "});",
+                  "pm.test(\"message contient « type_f »\", () => {",
+                  "  pm.expect(errors.some((e) => e.message.includes(\"type_f\"))).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains?type_f=BAYARD",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains"
+              ],
+              "query": [
+                {
+                  "key": "type_f",
+                  "value": "BAYARD"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/contact (corps vide)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const { errors } = pm.response.json();",
+                  "pm.test(\"erreur(s) sur name, email, subject, message\", () => {",
+                  "  pm.expect(errors.map((e) => e.field)).to.have.members([\"name\",\"email\",\"subject\",\"message\"]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/contact",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contact"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"répond 400\", () => {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "pm.test(\"format { errors: [{ field, message }] }\", () => {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+              "  body.errors.forEach((e) => {",
+              "    pm.expect(e).to.have.property(\"field\");",
+              "    pm.expect(e.message).to.be.a(\"string\");",
+              "  });",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "404 Not found",
+      "item": [
+        {
+          "name": "/fountains/9999999",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"erreur sans champ : l'id est valide mais inexistant\", () => {",
+                  "  pm.expect(pm.response.json().errors).to.deep.equal([{ field: null, message: \"Fontaine introuvable\" }]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fountains/9999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fountains",
+                "9999999"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"répond 404\", () => {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Manual",
+      "item": [
+        {
+          "name": "/contact (envoie un vrai e-mail)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Postman\",\n  \"email\": \"test@example.com\",\n  \"subject\": \"Test depuis Postman\",\n  \"message\": \"Ceci est un message de test envoyé depuis Postman.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/contact",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contact"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ]
+}
