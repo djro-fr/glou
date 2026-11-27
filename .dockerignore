@@ -1,0 +1,12 @@
+# Build context is the repo root (backend/ and db/ need tsconfig.base.json).
+# Never send secrets or local build output to the Docker daemon.
+.env
+.env.*
+!.env.example
+.git
+.github
+.claude
+**/node_modules
+**/dist
+docs
+*.md

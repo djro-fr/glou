@@ -1,0 +1,39 @@
+# GLOU: serves the SPA, proxies /api to the backend, HTTPS via Let's Encrypt.
+# GLOU_DOMAIN comes from docker-compose.prod.yml (e.g. glou.example.fr, or glou.localhost for a local test).
+# Caddy redirects HTTP to HTTPS automatically.
+
+{$GLOU_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		# Basemap: style on openmaptiles.geo.data.gouv.fr, tiles/glyphs/sprites on openmaptiles.data.gouv.fr.
+		# The script hash allows only the inline onload="this.media='all'" of the font stylesheet (index.html).
+		# style-src 'unsafe-inline': MapLibre and Svelte set inline style attributes.
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-hashes' 'sha256-MhtPZXr7+LpJUY5qtMutB+qWfQtMaPccfe7QXtCcEYc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://openmaptiles.geo.data.gouv.fr https://openmaptiles.data.gouv.fr; font-src 'self'; connect-src 'self' https://openmaptiles.geo.data.gouv.fr https://openmaptiles.data.gouv.fr; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		Permissions-Policy "geolocation=(self), camera=(), microphone=(), payment=(), usb=()"
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# API: /api/fountains -> backend:3000/fountains
+	handle_path /api/* {
+		header Cache-Control "no-store"
+		reverse_proxy backend:3000
+	}
+
+	# SPA: static files, unknown paths fall back to index.html (history-mode routing)
+	handle {
+		root * /srv
+
+		@hashed path /assets/*
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+
+		@notHashed not path /assets/*
+		header @notHashed Cache-Control "no-cache"
+
+		try_files {path} /index.html
+		file_server
+	}
+}
