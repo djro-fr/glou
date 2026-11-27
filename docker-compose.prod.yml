@@ -7,10 +7,18 @@
 # Separate project name: volumes don't mix with the dev docker-compose.yml
 name: glou-prod
 
+# Log rotation: without it, Docker's json-file logs grow without limit
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   glou_db:
     image: postgres:18-alpine
     restart: unless-stopped
+    logging: *default-logging
     environment:
       POSTGRES_USER: ${POSTGRES_USER:?}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
@@ -31,6 +39,7 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     restart: unless-stopped
+    logging: *default-logging
     environment:
       POSTGRES_USER: ${POSTGRES_USER:?}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
@@ -59,6 +68,7 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
     restart: unless-stopped
+    logging: *default-logging
     environment:
       GLOU_DOMAIN: ${GLOU_DOMAIN:?}
     ports:
@@ -79,6 +89,7 @@ services:
       dockerfile: db/Dockerfile
     # Never started by `up`; run on demand with `run --rm seed`
     profiles: [seed]
+    logging: *default-logging
     environment:
       POSTGRES_USER: ${POSTGRES_USER:?}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
