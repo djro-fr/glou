@@ -18,6 +18,7 @@
   import { filters, matchesFilters } from "./filters.svelte.js";
 
   import { untrack } from "svelte";
+  import { addToast,LOAD_ERROR_MESSAGE } from "../../shared/components/toasts.svelte.js";
 
   function fountainsToGeoJSON(fountains: Fountain[]) {
     return {
@@ -194,20 +195,24 @@
     });
   }
 
-  function initFountainLayer(
+  async function initFountainLayer(
     mapInstance: Map,
     onFountainsLoaded: (fountains: Fountain[]) => void,
     onPinClick: (fountain: Fountain) => void,
   ) {
-    fetch(`${import.meta.env.VITE_API_URL}/fountains`)
-      .then((res) => res.json())
-      .then((fountains: Fountain[]) => {
-        onFountainsLoaded(fountains);
-        const geojson = fountainsToGeoJSON(fountains);
+    try{
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/fountains`);
+      if (!res.ok) throw new Error(`API error: ${res.status}`);  
+      const fountains: Fountain[] = await res.json();
+      onFountainsLoaded(fountains);
+      const geojson = fountainsToGeoJSON(fountains);
         mapInstance.on("load", () =>
           handleMapLoad(mapInstance, geojson, fountains, onPinClick),
         );
-      });
+    } catch (err) {
+      console.error('Chargement des fontaines impossible :', err);
+      addToast(LOAD_ERROR_MESSAGE, 'error');
+    }
   }
 
   function fitToFountains(mapInstance: Map, list: Fountain[]) {
@@ -227,7 +232,7 @@
 
   let mapContainer: HTMLDivElement | undefined = $state();
   let map: Map | null = null;
-  let fountains: Fountain[] = $state.raw([]);
+  let fountains: Fountain[] = $state.raw([]);  
   let selectedFountain: Fountain | null = $state(null);
   let filteredFountains = $derived(fountains.filter((f) => matchesFilters(f)));
   let geolocate: GeolocateControl | null = null;
@@ -318,4 +323,5 @@
   <div class="loca-slot" bind:this={locaSlot}></div>
   <DistrictFilter />
   <FilterPanel {fountains} />
+
 </div>

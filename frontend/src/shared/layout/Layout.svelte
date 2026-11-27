@@ -5,6 +5,7 @@
   import './Layout.scss'
   
   import { location } from '@keenmate/svelte-spa-router';
+  import ToastContainer from "../components/ToastContainer.svelte";
 
   let isMapPage = $derived(location() === '/');
 
@@ -15,3 +16,4 @@
 <main class={isMapPage ? 'map-page' : ''}>
   <Router {routes} />
 </main>
+<ToastContainer />

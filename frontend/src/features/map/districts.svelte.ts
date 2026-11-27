@@ -1,4 +1,6 @@
 import type { District } from './types/district.ts';
+import { addToast,LOAD_ERROR_MESSAGE } from "../../shared/components/toasts.svelte.js";
+
 
 export interface DropdownDistrict extends District {
   id: number;
@@ -7,8 +9,7 @@ export interface DropdownDistrict extends District {
 
 export const districtsState = $state({
   list: [] as DropdownDistrict[],
-  loading: true,
-  error: null as string | null,
+  loading: true
 });
 
 let requested = false;
@@ -28,7 +29,8 @@ export async function loadDistricts() {
       label: `${d.number_d}. ${d.name_d}`,
     }));
   } catch (err) {
-    districtsState.error = err instanceof Error ? err.message : 'Erreur inconnue';
+    console.error('Chargement des quartiers impossible :', err);
+    addToast(LOAD_ERROR_MESSAGE, 'error');
   } finally {
     districtsState.loading = false;
   }

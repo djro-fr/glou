@@ -24,6 +24,5 @@
   ariaLabel="Filtrez par quartiers"
   clearLabel="Tous les quartiers"
   loading={districtsState.loading}
-  error={districtsState.error}
   disabled={!isDistrictAvailable(filters.city)}
 />

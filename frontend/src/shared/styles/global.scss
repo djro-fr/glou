@@ -193,3 +193,57 @@ main dialog {
 p.center{
   text-align: center;
 }
+
+.toasts{
+  z-index: 2;
+  position: absolute;  
+  bottom: 4rem;
+  left: 0;
+  right: 0;
+  font-family: $family-text;
+  display: flex;
+  flex-direction: column;  
+  max-width: 31rem;
+  margin-inline: auto; 
+}
+
+.toast{
+  position: relative;  
+  display: flex;
+  flex-direction: column;  
+  background-color: $neutral-100;
+  border-radius: $rounded-sm $rounded-sm 0 0;      
+  padding: .2rem .2rem 1rem;
+  margin: .5rem .5rem 0;
+  border: solid 2px $neutral-500;
+  box-shadow: $shd-overlay;
+  p{
+    padding: .5rem 1rem .8rem;
+  }
+  &__close{      
+    order: -1;
+    width: fit-content ;
+    padding: 0.5rem;
+    box-shadow: none;
+    background-color: transparent;
+    align-self: flex-end;
+    svg{
+      color:inherit;
+    }
+  }  
+  &--error{
+    background-color: $danger-100;
+    border-color: $danger-500;
+    .toast__close { color: $danger-500; }
+  }
+  &--success{
+    background-color: $success-100;
+    border-color: $success-500;    
+    .toast__close { color: $success-500; }
+  }
+  &--info{
+    background-color: $primary-100;
+    border-color: $primary-500;    
+    .toast__close { color: $primary-500; }
+  }
+}
