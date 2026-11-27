@@ -29,7 +29,7 @@
   As a visitor, I want to filter fountains by district name, so I can focus on my area.
 
 5. **US5, Filter by type**
-  As a visitor, I want to filter fountains by type (BAYARD, PRESTO, AUTRE, WATER CONNECT), so I can find a specific model if needed.
+  As a visitor, I want to filter fountains by type (BAYARD, PRESTO, AUTRE, WATER CONNECT, etc.), so I can find a specific model if needed.
 
 6. **US6, Filter by status**
   As a visitor, I want to filter fountains by status, so I can avoid closed or out-of-service fountains.
@@ -82,6 +82,10 @@
   - Honeypot anti-spam field (hidden off-screen, not `display: none`); the honeypot response is identical to a success response
   - Email sent in plain text, `from` = site address, `replyTo` = visitor's email (SPF/DMARC compliance)
 - Client-side routing (@keenmate/svelte-spa-router, history mode) to navigate between the map, About and Contact
+- **Error notifications**: toast notifications (shared store `toasts.svelte.ts` + `ToastContainer.svelte`, mounted once in the layout)
+  - Persistent until closed by the user (no auto-dismiss)
+  - Accessible: `aria-live="polite"` container always present in the DOM, `role="alert"` on error toasts
+  - Deduplicated: when both fountains and districts fail to load, a single message is shown
 
 ---
 
@@ -156,8 +160,9 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 
 ### Error handling & validation
 
-- Backend input validation uses Zod (`safeParse`, errors returned as an array of `{ field, message }` objects for per-field display).
-- A global Express error-handling middleware and dedicated PostgreSQL connection resilience (startup and runtime failures) ensure the API stays available and returns clear, structured error responses.
+- Backend input validation uses Zod (`safeParse`). Validation errors return **400** with a shared format: `{ errors: [{ field, message }] }`. `/fountains` query params use a strict schema: unknown params are rejected.
+- A global Express error-handling middleware logs the full error server-side and returns a generic **500** message in the same format, without exposing internal details. Dedicated PostgreSQL connection resilience handles startup and runtime failures.
+- Frontend: API responses are checked (`response.ok`) before use; loading failures are shown as a toast and logged in the console.
 
 ---
 
@@ -166,11 +171,12 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 | Method | Route | Description |
 | --- | --- | --- |
 | GET | `/fountains` | List all fountains (with district name, `LEFT JOIN`) |
-| GET | `/fountains/:id` | Fountain detail |
+| GET | `/fountains?city=X&district=Y&type=Z&status=W` | Filtered fountains (validated query params; not used by the frontend) |
+| GET | `/fountains/:id` | Fountain detail (not used by the frontend) |
 | GET | `/districts` | List of districts (id + name) |
 | POST | `/contact` | Send the contact form (name, email, subject, message) |
 
-Filtering is done client-side, so no filtered endpoint is used in V1.
+Filtering is done client-side in the frontend (small dataset). The server-side filters remain available for other API consumers.
 
 ---
 
@@ -189,7 +195,7 @@ Filtering is done client-side, so no filtered endpoint is used in V1.
 - Deploy job using a GitHub `production` environment (real `VITE_API_URL`)
 - SSH connection to the dedicated VPS, deployment via Docker Compose
 
-**VPS security (set up from the start, based on lessons learned from the Breco project):**
+**VPS security (to set up, based on lessons learned from the Breco project):**
 
 - Dedicated ED25519 SSH key for deployment; password authentication disabled
 - Fail2ban installed
@@ -199,7 +205,7 @@ Filtering is done client-side, so no filtered endpoint is used in V1.
 
 ## 9. Performance & Metrics
 
-Lighthouse mobile, measured on September 26, 2026, right after the Svelte migration (before the filter panel, contact form and geolocation). To be re-measured on the production deployment.
+Lighthouse mobile, measured locally on September 26, 2026, right after the Svelte migration (before the filter panel, contact form and geolocation). To be re-measured on the production deployment.
 
 - Lighthouse mobile: 89/100
 - First Contentful Paint (FCP): 2.4s
@@ -220,6 +226,7 @@ Lighthouse mobile, measured on September 26, 2026, right after the Svelte migrat
 - [x] Functional backend API connected to PostgreSQL
 - [x] Passing CI pipeline (lint, type check, build)
 - [x] Working contact form (submission + validation + visual feedback to the user)
+- [ ] Validate `/fountains/:id` (400 on invalid id, 404 when not found, single object instead of an array)
 - [ ] Fix `.env` path resolution in the compiled backend
 - [ ] Dockerfiles + `docker-compose.prod.yml`
 - [ ] Live deployment on the VPS, application accessible online
@@ -230,7 +237,8 @@ Lighthouse mobile, measured on September 26, 2026, right after the Svelte migrat
 ## 11. Known limitations
 
 - 38 fountains have no district in the source data: they are displayed on the map but can't be matched by the district filter.
-- The "Quartiers de proximité" dataset only covers the Toulouse commune: no district filtering for other cities.
+- 120 fountains have no status in the source data (shown with a neutral pin).
+- The districts ("Quartiers de proximité") dataset only covers the Toulouse commune: no district filtering for other cities.
 
 ---
 
@@ -254,4 +262,4 @@ Lighthouse mobile, measured on September 26, 2026, right after the Svelte migrat
 
 ## Last update
 
-November 20, 2026
+November 27, 2026
