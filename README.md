@@ -184,7 +184,7 @@ Container logs are rotated (`json-file`, 3 files of 10 MB per service).
 
 ## Deployment (VPS)
 
-GLOU is deployed to [glou.sylys.dev](https://glou.sylys.dev) on every push to `main`, once the three CI jobs pass: the `deploy` job in `.github/workflows/ci-cd.yml` connects over SSH and runs [`deploy/deploy.sh`](deploy/deploy.sh) on the VPS (`git pull --ff-only`, rebuild, wait for every service to be healthy, prune old images), then checks `https://glou.sylys.dev/api/health`.
+GLOU is deployed to [glou.sylys.dev](https://glou.sylys.dev) on every push to `main`, once the three CI jobs pass: the `deploy` job in `.github/workflows/ci-cd.yml` connects over SSH and runs [`deploy/deploy.sh`](deploy/deploy.sh) on the VPS (update the clone to `main` with a fast-forward only, whatever branch it is on, rebuild, wait for every service to be healthy, prune old images), then checks `https://glou.sylys.dev/api/health`.
 
 The deploy SSH key is restricted to that script (forced command in `authorized_keys`): if it leaked, it could only redeploy `main`, not open a shell.
 
@@ -226,6 +226,18 @@ Prerequisites on the VPS: Docker Engine with the Compose plugin, and git. DNS `A
 4. **Firewall**: `sudo ufw allow 80/tcp && sudo ufw allow 443/tcp && sudo ufw allow 443/udp`.
 
 5. **First deployment**, by hand:
+
+   > **First setup only:** until the deployment PR is merged, `deploy/deploy.sh` exists only on the `feat/deploy` branch, and the script always deploys `main`. So for this first deployment, switch the clone to `feat/deploy` and start the stack with Compose directly instead of `deploy.sh`:
+   >
+   > ```bash
+   > sudo -u deploy git -C /opt/glou switch feat/deploy
+   > cd /opt/glou && sudo -u deploy docker compose -f docker-compose.prod.yml up -d --build --wait
+   > sudo -u deploy docker compose -f docker-compose.prod.yml run --rm seed
+   > ```
+   >
+   > Leave the clone on `feat/deploy`: the restricted key needs `deploy/deploy.sh` on disk. After the merge, the first automatic deployment runs it, and it switches the clone to `main` by itself.
+
+   Afterwards (or on a new server once the PR is merged), the manual deployment is:
 
    ```bash
    sudo -u deploy /opt/glou/deploy/deploy.sh
@@ -347,4 +359,4 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 
 ## Last update
 
-November 20, 2026
+November 27, 2026

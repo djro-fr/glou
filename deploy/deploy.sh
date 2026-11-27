@@ -4,7 +4,7 @@
 # authorized_keys with command="/opt/glou/deploy/deploy.sh", so it can only run this script.
 # Can also be run by hand: /opt/glou/deploy/deploy.sh
 
-# Everything is inside main(), called on the last line: `git pull` may rewrite this file
+# Everything is inside main(), called on the last line: updating the clone may rewrite this file
 # while it runs, and bash has then already read the whole function.
 main() {
   set -euo pipefail
@@ -20,9 +20,12 @@ main() {
     exit 1
   fi
 
-  echo "==> Updating code ($(git rev-parse --short HEAD))"
-  # Refuses to deploy if the server copy has diverged from main
-  git pull --ff-only
+  echo "==> Updating code (was $(git rev-parse --abbrev-ref HEAD) at $(git rev-parse --short HEAD))"
+  # Always deploys main, whatever branch the clone is on.
+  # --ff-only refuses to deploy if the server copy of main has diverged from origin/main.
+  git fetch origin main
+  git switch main
+  git merge --ff-only origin/main
   echo "==> Now at $(git log -1 --format='%h %s')"
 
   echo "==> Building and starting containers"
