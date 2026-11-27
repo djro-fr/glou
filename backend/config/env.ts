@@ -1,11 +1,7 @@
-import { config } from 'dotenv';
-import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 
-const fileURL = new URL("../../.env", import.meta.url);
-const result = config({ path: fileURLToPath(fileURL) });
-if (result.error) console.warn("Fichier .env non trouvé :", fileURLToPath(fileURL));
-
+// The root .env is loaded by Node's --env-file flag in the npm scripts (see package.json),
+// so this module only validates process.env.
 const envSchema = z.object({
   SMTP_USER: z.email(),
   CONTACT_RECIPIENT: z.email(),

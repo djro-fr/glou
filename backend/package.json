@@ -2,7 +2,6 @@
   "type": "module",
   "dependencies": {
     "cors": "^2.8.6",
-    "dotenv": "^18.0.1",
     "express": "^5.2.1",
     "nodemailer": "^10.0.10",
     "pg": "^8.23.0",
@@ -11,8 +10,8 @@
   "scripts": {
     "check": "tsc --noEmit",
     "build": "tsc",
-    "dev":"tsx src/app.ts",
-    "start": "node dist/src/app.js"
+    "dev": "tsx --env-file=../.env src/app.ts",
+    "start": "node --env-file-if-exists=../.env dist/src/app.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
