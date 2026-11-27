@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Max value of a PostgreSQL INTEGER (fountain.id)
-const PG_INTEGER_MAX = 2147483647;
+export const PG_INTEGER_MAX = 2147483647;
 
 export const fountainIdSchema = z.strictObject({
   id: z.coerce.number("L'identifiant doit être un numéro")

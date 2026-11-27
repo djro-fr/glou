@@ -609,7 +609,7 @@
           "response": []
         },
         {
-          "name": "/fountains?district=0",
+          "name": "/fountains?district=0 (pas positif)",
           "event": [
             {
               "listen": "test",
@@ -619,6 +619,9 @@
                   "const { errors } = pm.response.json();",
                   "pm.test(\"erreur(s) sur district\", () => {",
                   "  pm.expect(errors.map((e) => e.field)).to.have.members([\"district\"]);",
+                  "});",
+                  "pm.test(\"message contient « positif »\", () => {",
+                  "  pm.expect(errors.some((e) => e.message.includes(\"positif\"))).to.be.true;",
                   "});"
                 ]
               }
