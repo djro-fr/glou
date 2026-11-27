@@ -24,11 +24,17 @@ A single `.env` at the repo root (template: `.env.example`) serves everything: P
 
 ```bash
 docker compose up -d                    # Postgres 18 on host port 5433; db/init/*.sql runs on first start (schema + districts)
-npx tsx db/scripts/seed-fountains.ts    # from repo root (reads db/data/ relative to cwd); idempotent
+npx tsx db/scripts/seed-fountains.ts    # from repo root (reads db/data/ relative to cwd); idempotent upsert in one transaction
 
 cd backend  && npm run dev              # Express API on :3000 (tsx)
 cd frontend && npm run dev              # Vite on :5173
+
+# Production stack (separate project "glou-prod"; needs GLOU_DOMAIN)
+docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml run --rm seed
 ```
+
+Production (`docker-compose.prod.yml`): Caddy (`frontend/Dockerfile` + `frontend/Caddyfile`) is the only service publishing ports (80/443, overridable with `HTTP_PORT`/`HTTPS_PORT`); it serves the SPA, proxies `/api/*` to `backend:3000` (prefix stripped), handles HTTPS and sets the security headers (CSP, HSTS, Permissions-Policy). Backend and Postgres stay on the internal network: never add `ports:` to them (Docker bypasses UFW). The frontend image is built with `VITE_API_URL=/api` (relative). Dockerfiles build from the repo root (`tsconfig.base.json`); `.dockerignore` keeps `.env` out of images. If the frontend loads a new external host or inline script, update the CSP in the Caddyfile.
 
 What CI runs (`.github/workflows/ci.yml`, three parallel jobs, Node 24); run the same before considering work done:
 
@@ -47,9 +53,9 @@ Express 5, layered Controller → Service → Repository, wired in `src/app.ts`:
 - **Repository**: raw SQL through a single shared `pg.Client` (`config/database.ts`), or Nodemailer for contact.
 - `Middleware/errorHandler.ts` catches anything thrown (Express 5 forwards async rejections) and returns a generic 500 in the same `{ errors }` format, without leaking internals.
 
-Config: the root `.env` is loaded by Node's `--env-file` flag in the npm scripts (`dev`: `tsx --env-file=../.env`, `start`: `node --env-file-if-exists=../.env`), not in code (no `dotenv` in `backend/`), so always start the backend through the npm scripts. `config/env.ts` validates SMTP + `CORS_ORIGINS` with Zod at startup; it must stay the **first import** in `app.ts` so validation runs before `config/database.ts` and the mailer read `process.env` directly. The DB connection is hardcoded to `127.0.0.1:5433`, and the server exits at startup if the database is unreachable: run `docker compose up -d` before `npm run dev` in `backend/`. Zod error messages use the French locale (`z.config(z.locales.fr())`) in both backend and frontend.
+Config: the root `.env` is loaded by Node's `--env-file` flag in the npm scripts (`dev`: `tsx --env-file=../.env`, `start`: `node --env-file-if-exists=../.env`), not in code (no `dotenv` in `backend/`), so always start the backend through the npm scripts. `config/env.ts` validates SMTP + `CORS_ORIGINS` with Zod at startup; it must stay the **first import** in `app.ts` so validation runs before `config/database.ts` and the mailer read `process.env` directly. The DB host/port come from `POSTGRES_HOST`/`POSTGRES_PORT` (validated in `env.ts`, default `127.0.0.1:5433` for the dev compose), and the server exits at startup if the database is unreachable: run `docker compose up -d` before `npm run dev` in `backend/`. Zod error messages use the French locale (`z.config(z.locales.fr())`) in both backend and frontend.
 
-`/fountains` uses a strict schema (unknown query params rejected). The frontend does not use server-side filters or `/fountains/:id`: it fetches all fountains once and filters client-side.
+`GET /health` runs `SELECT 1` and returns `{ status: "ok" }` (500 if the database is down); it is the backend's Docker healthcheck. `/fountains` uses a strict schema (unknown query params rejected). The frontend does not use server-side filters or `/fountains/:id`: it fetches all fountains once and filters client-side.
 
 ## Frontend architecture (`frontend/`)
 

@@ -9,6 +9,7 @@ import cors from 'cors';
 import { getAllFountainsController,getFountainByIdController } from './Controller/fountainController.ts';
 import { getAllDistrictsController }from './Controller/districtController.ts'
 import { sendContactEMailController } from './Controller/contactController.ts';
+import { healthController } from './Controller/healthController.ts';
 import { errorHandler } from './Middleware/errorHandler.ts';
 
 const app: Express = express();
@@ -28,6 +29,8 @@ app.get('/fountains/:id', getFountainByIdController );
 app.get('/districts', getAllDistrictsController);
 
 app.post('/contact', sendContactEMailController);
+
+app.get('/health', healthController);
 
 app.use(errorHandler);
 

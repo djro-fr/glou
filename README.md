@@ -163,6 +163,23 @@ _Coming soon, once deployed._
 | `backend/` | `start` | Run the compiled production server (loads the root `.env` if present) |
 | `db/` | `check` | Type-check the seed scripts |
 
+## Production (Docker)
+
+`docker-compose.prod.yml` runs the full stack: Caddy (serves the frontend, proxies `/api` to the backend, HTTPS with Let's Encrypt), the backend and PostgreSQL. Only Caddy publishes ports (80/443); the backend and the database stay on the internal Docker network.
+
+On the server, with the root `.env` filled in (including `GLOU_DOMAIN`, the public domain):
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml run --rm seed   # load or update the 481 fountains (safe to re-run)
+```
+
+To try it locally (ports 8080/8443, local certificate from Caddy to accept in the browser), open `https://glou.localhost:8443` after:
+
+```bash
+GLOU_DOMAIN=glou.localhost HTTP_PORT=8080 HTTPS_PORT=8443 docker compose -f docker-compose.prod.yml up -d --build
+```
+
 ## API tests (Postman)
 
 The API is tested with a Postman collection: [`docs/postman/GLOU.postman_collection.json`](docs/postman/GLOU.postman_collection.json). Requests are grouped by expected status code (200, 400, 404). Each request checks the status code and the response body: the shape of the data, that filters are applied, and the shared error format `{ errors: [{ field, message }] }`. To run it, start the database and the backend (steps 4 to 6 above), import the collection into Postman and run it with the Collection Runner. The `baseUrl` collection variable defaults to `http://localhost:3000`. Leave the **Manual** folder unchecked: its request sends a real email through the contact form.
@@ -179,6 +196,7 @@ The API is tested with a Postman collection: [`docs/postman/GLOU.postman_collect
 │   ├── data/                    # CSV sources, versioned
 │   ├── init/                    # Schema + districts seed (auto-run on first container start)
 │   ├── scripts/                 # Seeds fountains
+│   ├── Dockerfile               # One-shot seed service (production)
 │   └── tsconfig.json            # Extends ../tsconfig.base.json
 │
 ├── backend/
@@ -189,6 +207,7 @@ The API is tested with a Postman collection: [`docs/postman/GLOU.postman_collect
 │   │   ├── Repository/          # Data access (PostgreSQL, SMTP)
 │   │   ├── DTO/                 # Zod validation schemas
 │   │   └── Middleware/          # Global error handling
+│   ├── Dockerfile               # Production image (compiled code, non-root)
 │   └── tsconfig.json            # Extends ../tsconfig.base.json
 │
 ├── frontend/
@@ -205,12 +224,16 @@ The API is tested with a Postman collection: [`docs/postman/GLOU.postman_collect
 │   │   ├── shared/              # Reusable components, helpers, layout, styles
 │   │   └── routes.ts            # Router configuration
 │   ├── build-tokens.ts          # Generates tokens.css / tokens.scss from tokens.json
+│   ├── Caddyfile                # Production: static files, /api proxy, HTTPS, security headers
+│   ├── Dockerfile               # Production image: Vite build served by Caddy
 │   ├── tsconfig.json            # Project references (app + node)
 │   ├── tsconfig.app.json        # Browser code (src/)
 │   └── tsconfig.node.json       # Node code (vite.config.ts)
 │
 ├── .env.example                 # Environment variables template
+├── .dockerignore                # Keeps .env, node_modules and build output out of images
 ├── docker-compose.yml           # PostgreSQL service for local dev
+├── docker-compose.prod.yml      # Production stack: Caddy, backend, PostgreSQL, seed
 ├── README.md                    # Project documentation
 └── tsconfig.base.json           # Shared TypeScript options (extended by backend/ and db/)
 ```

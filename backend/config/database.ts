@@ -1,12 +1,12 @@
-
 import pg from 'pg';
+import { env } from './env.ts';
 
 export const client = new pg.Client({
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  host: '127.0.0.1',
-  port: 5433,
+  host: env.POSTGRES_HOST,
+  port: env.POSTGRES_PORT,
 });
 client.on('error', (err) => {
   console.error('Erreur de connexion PostgreSQL :', err);

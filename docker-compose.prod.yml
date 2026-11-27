@@ -1,0 +1,95 @@
+# Production stack. Only Caddy publishes ports: Docker bypasses UFW, so any published port is public.
+# Variables come from the root .env (see .env.example), GLOU_DOMAIN included.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.prod.yml run --rm seed     # load/update the fountains (idempotent)
+
+# Separate project name: volumes don't mix with the dev docker-compose.yml
+name: glou-prod
+
+services:
+  glou_db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:?}
+    volumes:
+      # Postgres 18 image: volume at /var/lib/postgresql (PGDATA=/var/lib/postgresql/18/docker)
+      - db_data:/var/lib/postgresql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:?}
+      POSTGRES_HOST: glou_db
+      POSTGRES_PORT: "5432"
+      SMTP_HOST: ${SMTP_HOST:?}
+      SMTP_PORT: ${SMTP_PORT:?}
+      SMTP_USER: ${SMTP_USER:?}
+      SMTP_PASS: ${SMTP_PASS:?}
+      CONTACT_RECIPIENT: ${CONTACT_RECIPIENT:?}
+      # Same origin as the frontend (served by Caddy), required by config/env.ts
+      CORS_ORIGINS: https://${GLOU_DOMAIN:?}
+    depends_on:
+      glou_db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:3000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  caddy:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    environment:
+      GLOU_DOMAIN: ${GLOU_DOMAIN:?}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTPS_PORT:-443}:443/udp"
+    volumes:
+      # Certificates and Caddy state: keep them across restarts (Let's Encrypt rate limits)
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  seed:
+    build:
+      context: .
+      dockerfile: db/Dockerfile
+    # Never started by `up`; run on demand with `run --rm seed`
+    profiles: [seed]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:?}
+      POSTGRES_HOST: glou_db
+      POSTGRES_PORT: "5432"
+    depends_on:
+      glou_db:
+        condition: service_healthy
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:

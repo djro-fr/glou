@@ -305,6 +305,36 @@
           "response": []
         },
         {
+          "name": "/health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"renvoie { status: \\\"ok\\\" }\", () => {",
+                  "  pm.expect(pm.response.json()).to.deep.equal({ status: \"ok\" });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "/contact (honeypot website rempli, aucun e-mail envoyé)",
           "event": [
             {
