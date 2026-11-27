@@ -148,7 +148,7 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 | Containerization | Docker Compose (frontend, backend, PostgreSQL) |
 
 - Monorepo: `frontend/`, `backend/`, `db/`, each with its own `package.json`; shared `tsconfig.base.json` extended by `backend/` and `db/`
-- Single `.env` at the repository root (PostgreSQL, SMTP, `CORS_ORIGINS`, `VITE_API_URL`), read by Vite via `envDir`
+- Single `.env` at the repository root (PostgreSQL, SMTP, `CORS_ORIGINS`, `VITE_API_URL`), read by Vite via `envDir` and loaded in the backend by Node's `--env-file` flag in the `dev` and `start` scripts (`--env-file-if-exists` for `start`, so variables can come from the environment instead, e.g. Docker)
 - Backend environment variables validated at startup with Zod (`backend/config/env.ts`); CORS origins configurable via `CORS_ORIGINS`
 - The frontend build fails if `VITE_API_URL` is missing (check in `vite.config.ts`)
 - Design tokens pipeline: Tokens Studio (Figma) → DTCG format (tokens.json) → Style Dictionary (@tokens-studio/sd-transforms) → `tokens.css` (CSS custom properties, also read by MapLibre layer styling via `getComputedStyle()`) + `tokens.scss` (Sass variables for compile-time use)
@@ -229,7 +229,7 @@ Lighthouse mobile, measured locally on September 26, 2026, right after the Svelt
 - [x] Passing CI pipeline (lint, type check, build)
 - [x] Working contact form (submission + validation + visual feedback to the user)
 - [x] Validate `/fountains/:id` (400 on invalid id, 404 when not found, single object instead of an array)
-- [ ] Fix `.env` path resolution in the compiled backend
+- [x] Fix `.env` path resolution in the compiled backend
 - [ ] Dockerfiles + `docker-compose.prod.yml`
 - [ ] Live deployment on the VPS, application accessible online
 - [ ] Complete README (context, stack, installation, screenshots)

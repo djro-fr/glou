@@ -160,7 +160,7 @@ _Coming soon, once deployed._
 | `backend/` | `dev` | Start the dev server (tsx) |
 | `backend/` | `check` | Type-check (`tsc --noEmit`) |
 | `backend/` | `build` | Compile to `dist/` |
-| `backend/` | `start` | Run the compiled production server |
+| `backend/` | `start` | Run the compiled production server (loads the root `.env` if present) |
 | `db/` | `check` | Type-check the seed scripts |
 
 ## API tests (Postman)
