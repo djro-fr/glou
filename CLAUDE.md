@@ -47,7 +47,7 @@ Express 5, layered Controller → Service → Repository, wired in `src/app.ts`:
 - **Repository**: raw SQL through a single shared `pg.Client` (`config/database.ts`), or Nodemailer for contact.
 - `Middleware/errorHandler.ts` catches anything thrown (Express 5 forwards async rejections) and returns a generic 500 in the same `{ errors }` format, without leaking internals.
 
-Config: `config/env.ts` loads the root `.env` and validates SMTP + `CORS_ORIGINS` with Zod at startup. It must stay the **first import** in `app.ts`, since `config/database.ts` and the mailer read `process.env` directly. The DB connection is hardcoded to `127.0.0.1:5433`, and the server exits at startup if the database is unreachable: run `docker compose up -d` before `npm run dev` in `backend/`. Zod error messages use the French locale (`z.config(z.locales.fr())`) in both backend and frontend. 
+Config: `config/env.ts` loads the root `.env` and validates SMTP + `CORS_ORIGINS` with Zod at startup. It must stay the **first import** in `app.ts`, since `config/database.ts` and the mailer read `process.env` directly. The DB connection is hardcoded to `127.0.0.1:5433`, and the server exits at startup if the database is unreachable: run `docker compose up -d` before `npm run dev` in `backend/`. Zod error messages use the French locale (`z.config(z.locales.fr())`) in both backend and frontend.
 
 `/fountains` uses a strict schema (unknown query params rejected). The frontend does not use server-side filters or `/fountains/:id`: it fetches all fountains once and filters client-side.
 

@@ -136,7 +136,7 @@ _Coming soon, once deployed._
       npm run dev
 
       # Terminal 2: Frontend (port 5173 Vite dev server)
-      cd frontend 
+      cd frontend
       npm run dev
    ```
 
@@ -175,7 +175,7 @@ _Coming soon, once deployed._
 │   ├── init/                    # Schema + districts seed (auto-run on first container start)
 │   ├── scripts/                 # Seeds fountains
 │   └── tsconfig.json            # Extends ../tsconfig.base.json
-│    
+│
 ├── backend/
 │   ├── config/                  # Env, database and transporter (smtp mail) configuration
 │   ├── src/
@@ -190,10 +190,10 @@ _Coming soon, once deployed._
 │   ├── design-system/
 │   │   └── tokens.json          # Design tokens (Tokens Studio / DTCG format)
 │   ├── public/                  # Static assets (fonts, icons, images, favicons)
-│   ├── src/   
+│   ├── src/
 │   │   ├── features/            # Feature-based structure
-│   │   │   ├── about/   
-│   │   │   ├── contact/   
+│   │   │   ├── about/
+│   │   │   ├── contact/
 │   │   │   └── map/             # Fountain map with clustering, details panel & filters
 │   │   │       ├── types/       # Map feature TypeScript interfaces (district, fountain)
 │   │   │       └── *.svelte.ts  # Shared reactive state (filters, districts)
