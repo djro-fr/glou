@@ -186,7 +186,7 @@ Filtering is done client-side in the frontend (small dataset). The server-side f
 
 ## 8. CI/CD & Deployment
 
-**CI (GitHub Actions, `ci.yml`), triggered on push/PR:**
+**CI (GitHub Actions, `ci-cd.yml`), triggered on push/PR:**
 
 - Three jobs running in parallel: `db`, `backend`, `frontend`
 - Each job: `npm ci` + lint (ESLint) + type check + build (10-minute timeout per job)
@@ -204,16 +204,24 @@ Filtering is done client-side in the frontend (small dataset). The server-side f
 - The frontend image is built with `VITE_API_URL=/api` (same domain), so the same image works locally and in production; frontend and API share an origin, so CORS is not needed in practice
 - Variables come from the root `.env` on the server, including `GLOU_DOMAIN`
 
-**CD, triggered on push to `main` (to do):**
+- Container logs rotated (`json-file` driver, 3 × 10 MB per service)
 
-- Deploy job using a GitHub `production` environment
-- SSH connection to the dedicated VPS, deployment via Docker Compose
+**CD (`deploy` job in `ci-cd.yml`), triggered on push to `main`:**
 
-**VPS security (to set up, based on lessons learned from the Breco project):**
+- Runs only if the three CI jobs pass (`needs`), never on pull requests; one deployment at a time (`concurrency: production`)
+- GitHub `production` environment (restricted to `main`) holding the secrets: `SSH_HOST`, `SSH_PORT`, `SSH_USER`, `SSH_PRIVATE_KEY`, `SSH_KNOWN_HOSTS`; no manual approval for now
+- SSH to the VPS as the dedicated `deploy` user (member of the `docker` group); the deploy key is restricted in `authorized_keys` to a forced command (`/opt/glou/deploy/deploy.sh`, no PTY, no forwarding), so a leaked key could only redeploy `main`
+- `deploy/deploy.sh` on the VPS: always deploys `main` (`git fetch origin main`, `git switch main`, `git merge --ff-only origin/main` in `/opt/glou`, whatever branch the clone is on), `docker compose up -d --build --wait` (fails if a service does not become healthy), prune unused images; a lock prevents concurrent runs
+- Smoke test after deployment: `https://glou.sylys.dev/api/health`
+- Images are built on the VPS (no registry); the fountains seed is run by hand when the CSV changes
+- Rollback: `git reset --hard <sha>` on the VPS and rebuild (the next push to `main` redeploys `main`)
+- Setup steps documented in the README ("Deployment (VPS)")
 
-- Dedicated ED25519 SSH key for deployment; password authentication disabled
+**VPS security (shared with the Breco project):**
+
+- SSH key authentication only, custom port; dedicated ED25519 key for deployment, restricted to the deploy script
 - Fail2ban installed
-- Firewall (UFW) configured restrictively
+- Firewall (UFW) configured restrictively; ports 80/443 opened for Caddy
 
 ---
 

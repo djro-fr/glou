@@ -180,6 +180,95 @@ To try it locally (ports 8080/8443, local certificate from Caddy to accept in th
 GLOU_DOMAIN=glou.localhost HTTP_PORT=8080 HTTPS_PORT=8443 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
+Container logs are rotated (`json-file`, 3 files of 10 MB per service).
+
+## Deployment (VPS)
+
+GLOU is deployed to [glou.sylys.dev](https://glou.sylys.dev) on every push to `main`, once the three CI jobs pass: the `deploy` job in `.github/workflows/ci-cd.yml` connects over SSH and runs [`deploy/deploy.sh`](deploy/deploy.sh) on the VPS (update the clone to `main` with a fast-forward only, whatever branch it is on, rebuild, wait for every service to be healthy, prune old images), then checks `https://glou.sylys.dev/api/health`.
+
+The deploy SSH key is restricted to that script (forced command in `authorized_keys`): if it leaked, it could only redeploy `main`, not open a shell.
+
+### One-time setup
+
+Prerequisites on the VPS: Docker Engine with the Compose plugin, and git. DNS `A`/`AAAA` records for `glou.sylys.dev` point to the VPS.
+
+1. **Deploy key**, on your machine (Git Bash), then print the restricted `authorized_keys` line:
+
+   ```bash
+   ssh-keygen -t ed25519 -f ~/.ssh/glou_deploy -C "github-actions-glou-deploy" -N ""
+   printf 'command="/opt/glou/deploy/deploy.sh",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty %s\n' "$(cat ~/.ssh/glou_deploy.pub)"
+   ```
+
+2. **`deploy` user** on the VPS (member of the `docker` group), with that line as its only authorized key:
+
+   ```bash
+   sudo adduser --disabled-password --gecos "" deploy
+   sudo usermod -aG docker deploy
+   sudo install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
+   sudo nano /home/deploy/.ssh/authorized_keys          # paste the line printed in step 1
+   sudo chown deploy:deploy /home/deploy/.ssh/authorized_keys
+   sudo chmod 600 /home/deploy/.ssh/authorized_keys
+   ```
+
+   If `/etc/ssh/sshd_config` has an `AllowUsers` line, add `deploy` to it, then `sudo systemctl reload ssh`.
+
+3. **Project and `.env`**:
+
+   ```bash
+   sudo install -d -o deploy -g deploy /opt/glou
+   sudo -u deploy git clone https://github.com/djro-fr/glou.git /opt/glou
+   sudo -u deploy install -m 600 /opt/glou/.env.example /opt/glou/.env
+   sudo -u deploy nano /opt/glou/.env    # GLOU_DOMAIN=glou.sylys.dev, strong Postgres password, SMTP
+   ```
+
+   `CORS_ORIGINS` and `VITE_API_URL` are not used in production (set by `docker-compose.prod.yml`).
+
+4. **Firewall**: `sudo ufw allow 80/tcp && sudo ufw allow 443/tcp && sudo ufw allow 443/udp`.
+
+5. **First deployment**, by hand:
+
+   > **First setup only:** until the deployment PR is merged, `deploy/deploy.sh` exists only on the `feat/deploy` branch, and the script always deploys `main`. So for this first deployment, switch the clone to `feat/deploy` and start the stack with Compose directly instead of `deploy.sh`:
+   >
+   > ```bash
+   > sudo -u deploy git -C /opt/glou switch feat/deploy
+   > cd /opt/glou && sudo -u deploy docker compose -f docker-compose.prod.yml up -d --build --wait
+   > sudo -u deploy docker compose -f docker-compose.prod.yml run --rm seed
+   > ```
+   >
+   > Leave the clone on `feat/deploy`: the restricted key needs `deploy/deploy.sh` on disk. After the merge, the first automatic deployment runs it, and it switches the clone to `main` by itself.
+
+   Afterwards (or on a new server once the PR is merged), the manual deployment is:
+
+   ```bash
+   sudo -u deploy /opt/glou/deploy/deploy.sh
+   cd /opt/glou && sudo -u deploy docker compose -f docker-compose.prod.yml run --rm seed
+   ```
+
+6. **GitHub**: Settings → Environments → New environment `production`, deployment branches restricted to `main`, with these secrets:
+
+   | Secret | Value |
+   | --- | --- |
+   | `SSH_HOST` | VPS host name or IP |
+   | `SSH_PORT` | VPS SSH port |
+   | `SSH_USER` | `deploy` |
+   | `SSH_PRIVATE_KEY` | content of `~/.ssh/glou_deploy` (private key) |
+   | `SSH_KNOWN_HOSTS` | output of `ssh-keyscan -p <port> <host>` (compare with `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` on the VPS) |
+
+   Once the secret is saved, keep the private key in a password manager or delete it from your machine.
+
+### Operations
+
+On the VPS, from `/opt/glou` (as `deploy`, e.g. `sudo -u deploy …`):
+
+```bash
+docker compose -f docker-compose.prod.yml ps                  # service status and health
+docker compose -f docker-compose.prod.yml logs -f backend     # logs
+docker compose -f docker-compose.prod.yml run --rm seed       # reload the fountains after a CSV update
+
+# Rollback to a previous commit (the next push to main redeploys main)
+git reset --hard <commit-sha> && docker compose -f docker-compose.prod.yml up -d --build --wait
+```
+
 ## API tests (Postman)
 
 The API is tested with a Postman collection: [`docs/postman/GLOU.postman_collection.json`](docs/postman/GLOU.postman_collection.json). Requests are grouped by expected status code (200, 400, 404). Each request checks the status code and the response body: the shape of the data, that filters are applied, and the shared error format `{ errors: [{ field, message }] }`. To run it, start the database and the backend (steps 4 to 6 above), import the collection into Postman and run it with the Collection Runner. The `baseUrl` collection variable defaults to `http://localhost:3000`. Leave the **Manual** folder unchecked: its request sends a real email through the contact form.
@@ -188,7 +277,9 @@ The API is tested with a Postman collection: [`docs/postman/GLOU.postman_collect
 
 ```text
 .
-├── .github/workflows/ci.yml     # CI: lint, type-check, build (GitHub Actions)
+├── .github/workflows/ci-cd.yml  # CI: lint, type-check, build; CD: deploy to the VPS on main (GitHub Actions)
+├── deploy/
+│   └── deploy.sh                # Run on the VPS by the deploy job: pull, rebuild, wait for healthy
 ├── docs/
 │   ├── postman/                 # Postman collection (API tests)
 │   └── SPECIFICATIONS.md
@@ -268,4 +359,4 @@ The script is idempotent (`ON CONFLICT (id) DO NOTHING`): re-running it on an al
 
 ## Last update
 
-November 20, 2026
+November 27, 2026
