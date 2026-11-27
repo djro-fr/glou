@@ -62,7 +62,7 @@ Sass variables only exist at compile time, so MapLibre, configured in JS, needs 
 
 ## Live demo
 
-_Coming soon, once deployed._
+[glou.sylys.dev](https://glou.sylys.dev), deployed automatically on every push to `main` (see [Deployment](#deployment-vps)).
 
 ## Local setup
 

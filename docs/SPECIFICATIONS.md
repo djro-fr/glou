@@ -251,7 +251,7 @@ Lighthouse mobile, measured locally on September 26, 2026, right after the Svelt
 - [x] Validate `/fountains/:id` (400 on invalid id, 404 when not found, single object instead of an array)
 - [x] Fix `.env` path resolution in the compiled backend
 - [x] Dockerfiles + `docker-compose.prod.yml`
-- [ ] Live deployment on the VPS, application accessible online
+- [x] Live deployment on the VPS, application accessible online (https://glou.sylys.dev)
 - [ ] Complete README (context, stack, installation, screenshots)
 
 ---
