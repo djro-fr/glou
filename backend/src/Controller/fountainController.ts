@@ -1,4 +1,5 @@
 import { fountainFiltersSchema } from "../DTO/fountainFilters.ts";
+import { fountainIdSchema } from "../DTO/fountainId.ts";
 import {getAllFountainsService, getFountainByIdService} from '../Service/fountainService.ts'
 
 import { type Request, type Response } from 'express';
@@ -27,6 +28,21 @@ export async function getAllFountainsController(req: Request, res: Response) {
   
 
 export async function getFountainByIdController(req: Request, res: Response) {
-  const result = await getFountainByIdService(Number(req.params.id));
-  res.send(result);
+  const result = fountainIdSchema.safeParse(req.params);
+  if (!result.success) {
+    const errors = result.error.issues.map((issue) => ({
+      field: String(issue.path[0]),
+      message: issue.message,
+    }));
+    res.status(400).json({ errors });
+    return;
+  }
+  const fountain = await getFountainByIdService(result.data.id);
+  if (!fountain) {
+    res.status(404).json({
+      errors: [{ field: null, message: 'Fontaine introuvable' }],
+    });
+    return;
+  }
+  res.json(fountain);
 }
