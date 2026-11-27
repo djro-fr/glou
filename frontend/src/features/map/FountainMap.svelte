@@ -197,6 +197,7 @@
 
   async function initFountainLayer(
     mapInstance: Map,
+    mapLoaded: Promise<unknown>,
     onFountainsLoaded: (fountains: Fountain[]) => void,
     onPinClick: (fountain: Fountain) => void,
   ) {
@@ -206,9 +207,8 @@
       const fountains: Fountain[] = await res.json();
       onFountainsLoaded(fountains);
       const geojson = fountainsToGeoJSON(fountains);
-        mapInstance.on("load", () =>
-          handleMapLoad(mapInstance, geojson, fountains, onPinClick),
-        );
+      await mapLoaded;
+      handleMapLoad(mapInstance, geojson, fountains, onPinClick);
     } catch (err) {
       console.error('Chargement des fontaines impossible :', err);
       addToast(LOAD_ERROR_MESSAGE, 'error');
@@ -265,6 +265,8 @@
       });
       map = mapInstance;
 
+      const mapLoaded = mapInstance.once('load');
+
       const control = new MapLibreGeolocate({        
         trackUserLocation: true,                       
         showAccuracyCircle: true,                      
@@ -278,6 +280,7 @@
 
       initFountainLayer(
         mapInstance,
+        mapLoaded,
         (loaded) => (fountains = loaded),
         (fountain) => (selectedFountain = fountain),
       );
