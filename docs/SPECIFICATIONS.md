@@ -145,7 +145,7 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 | Database | PostgreSQL (no PostGIS extension in V1), `pg` driver |
 | CI | GitHub Actions |
 | CD | Deployment on a dedicated VPS |
-| Containerization | Docker Compose (frontend, backend, PostgreSQL) |
+| Containerization | Docker Compose (Caddy serving the frontend, backend, PostgreSQL) |
 
 - Monorepo: `frontend/`, `backend/`, `db/`, each with its own `package.json`; shared `tsconfig.base.json` extended by `backend/` and `db/`
 - Single `.env` at the repository root (PostgreSQL, SMTP, `CORS_ORIGINS`, `VITE_API_URL`), read by Vite via `envDir` and loaded in the backend by Node's `--env-file` flag in the `dev` and `start` scripts (`--env-file-if-exists` for `start`, so variables can come from the environment instead, e.g. Docker)
@@ -176,6 +176,9 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 | GET | `/fountains/:id` | Fountain detail as a single object; 400 if the id is not a positive integer, 404 if not found (not used by the frontend) |
 | GET | `/districts` | List of districts (id + name) |
 | POST | `/contact` | Send the contact form (name, email, subject, message) |
+| GET | `/health` | Health check: `SELECT 1` on the database, returns `{ status: "ok" }` (500 if the database is down); used by the Docker healthcheck |
+
+In production, the API is served on the same domain as the frontend under `/api` (e.g. `/api/fountains`); Caddy strips the prefix before forwarding to the backend.
 
 Filtering is done client-side in the frontend (small dataset). The server-side filters remain available for other API consumers.
 
@@ -191,10 +194,19 @@ Filtering is done client-side in the frontend (small dataset). The server-side f
 - API tests: Postman collection (`docs/postman/GLOU.postman_collection.json`), run manually with the Collection Runner (not part of the pipeline)
 - Code quality checked locally in the editor with SonarQube for IDE (not part of the pipeline)
 
+**Production stack (`docker-compose.prod.yml`, project `glou-prod`):**
+
+- `caddy` (`frontend/Dockerfile` + `frontend/Caddyfile`): serves the built SPA (history-mode fallback to `index.html`), proxies `/api/*` to the backend, HTTPS via Let's Encrypt with HTTP → HTTPS redirect. Only service publishing ports (80/443): Docker bypasses UFW, so any published port is public
+- Security headers set by Caddy: Content-Security-Policy (self + the basemap hosts `openmaptiles.geo.data.gouv.fr` / `openmaptiles.data.gouv.fr`), Strict-Transport-Security, Permissions-Policy, X-Content-Type-Options, Referrer-Policy, `Server` header removed; Cache-Control `immutable` for hashed `/assets/*`, `no-cache` for other files, `no-store` for the API
+- `backend` (`backend/Dockerfile`): compiled code + production dependencies, non-root user, healthcheck on `/health`; no published port
+- `glou_db`: `postgres:18-alpine` (volume on `/var/lib/postgresql`), `db/init/*.sql` on first start, `pg_isready` healthcheck; no published port
+- `seed` (`db/Dockerfile`): one-shot service, run on demand with `docker compose -f docker-compose.prod.yml run --rm seed`; idempotent upsert in a single transaction
+- The frontend image is built with `VITE_API_URL=/api` (same domain), so the same image works locally and in production; frontend and API share an origin, so CORS is not needed in practice
+- Variables come from the root `.env` on the server, including `GLOU_DOMAIN`
+
 **CD, triggered on push to `main` (to do):**
 
-- Dockerfiles for frontend and backend + `docker-compose.prod.yml`
-- Deploy job using a GitHub `production` environment (real `VITE_API_URL`)
+- Deploy job using a GitHub `production` environment
 - SSH connection to the dedicated VPS, deployment via Docker Compose
 
 **VPS security (to set up, based on lessons learned from the Breco project):**
@@ -230,7 +242,7 @@ Lighthouse mobile, measured locally on September 26, 2026, right after the Svelt
 - [x] Working contact form (submission + validation + visual feedback to the user)
 - [x] Validate `/fountains/:id` (400 on invalid id, 404 when not found, single object instead of an array)
 - [x] Fix `.env` path resolution in the compiled backend
-- [ ] Dockerfiles + `docker-compose.prod.yml`
+- [x] Dockerfiles + `docker-compose.prod.yml`
 - [ ] Live deployment on the VPS, application accessible online
 - [ ] Complete README (context, stack, installation, screenshots)
 
