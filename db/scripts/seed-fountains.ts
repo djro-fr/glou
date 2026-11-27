@@ -31,43 +31,66 @@ const client = new pg.Client({
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  host: 'localhost',
-  port: 5433,
+  // Defaults match the dev docker-compose.yml; docker-compose.prod.yml sets the internal service name and port
+  host: process.env.POSTGRES_HOST || 'localhost',
+  port: Number(process.env.POSTGRES_PORT || 5433),
 });
 
-let conflictCount = 0;
+let inserted = 0;
+let updated = 0;
+let skipped = 0;
 
-await client.connect();  
-for (const row of rows) {
-  const geoPoint = row['Geo Point'];
-  const [latitude, longitude] = geoPoint.split(',').map(v => Number.parseFloat(v));
-  const quartierNumero = row.quartier === '' ? null : Number(row.quartier);
-  if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
-    console.warn('Coordonnées invalides pour la ligne id', row.id_fontaines_a_boire);
-    continue; // passe à la ligne suivante sans essayer d'insérer
+await client.connect();
+try {
+  // Une seule transaction : en cas d'erreur, rien n'est écrit (pas de seed à moitié fait)
+  await client.query('BEGIN');
+  for (const row of rows) {
+    const geoPoint = row['Geo Point'];
+    const [latitude, longitude] = geoPoint.split(',').map(v => Number.parseFloat(v));
+    const quartierNumero = row.quartier === '' ? null : Number(row.quartier);
+    if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
+      console.warn('Coordonnées invalides pour la ligne id', row.id_fontaines_a_boire);
+      skipped++;
+      continue; // passe à la ligne suivante sans essayer d'insérer
+    }
+    // Upsert : relancer le seed met à jour les fontaines existantes au lieu de les dupliquer.
+    // xmax = 0 uniquement pour une ligne nouvellement insérée.
+    const result = await client.query<{ inserted: boolean }>(
+      `INSERT INTO fountain (id, location_f, type_f, address_f, city, status_f, latitude, longitude, district_number)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       ON CONFLICT (id) DO UPDATE SET
+         location_f = EXCLUDED.location_f,
+         type_f = EXCLUDED.type_f,
+         address_f = EXCLUDED.address_f,
+         city = EXCLUDED.city,
+         status_f = EXCLUDED.status_f,
+         latitude = EXCLUDED.latitude,
+         longitude = EXCLUDED.longitude,
+         district_number = EXCLUDED.district_number
+       RETURNING (xmax = 0) AS inserted`,
+      [
+        Number(row.id_fontaines_a_boire),
+        row.localisation,
+        row.type,
+        row.adresse,
+        row.commune,
+        row.statut,
+        latitude,
+        longitude,
+        quartierNumero
+      ]
+    );
+    if (result.rows[0]?.inserted) {
+      inserted++;
+    } else {
+      updated++;
+    }
   }
-  const result = await client.query(
-    `INSERT INTO fountain (id, location_f, type_f, address_f, city, status_f, latitude, longitude, district_number)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-     ON CONFLICT (id) DO NOTHING`,
-    [
-      Number(row.id_fontaines_a_boire),
-      row.localisation,
-      row.type,
-      row.adresse,
-      row.commune,
-      row.statut,
-      latitude,
-      longitude,
-      quartierNumero
-    ]
-  );
-  if (result.rowCount === 0) {
-    conflictCount++;
-  }
+  await client.query('COMMIT');
+  console.log(`Seed terminé : ${inserted} ajoutée(s), ${updated} mise(s) à jour, ${skipped} ignorée(s).`);
+} catch (err) {
+  await client.query('ROLLBACK');
+  throw err;
+} finally {
+  await client.end();
 }
-console.log(`Seed terminé. ${conflictCount} conflits détectés.`);
-await client.end();
-
-
-
