@@ -173,7 +173,7 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 | --- | --- | --- |
 | GET | `/fountains` | List all fountains (with district name, `LEFT JOIN`) |
 | GET | `/fountains?city=X&district=Y&type=Z&status=W` | Filtered fountains (validated query params; not used by the frontend) |
-| GET | `/fountains/:id` | Fountain detail (not used by the frontend) |
+| GET | `/fountains/:id` | Fountain detail as a single object; 400 if the id is not a positive integer, 404 if not found (not used by the frontend) |
 | GET | `/districts` | List of districts (id + name) |
 | POST | `/contact` | Send the contact form (name, email, subject, message) |
 
@@ -227,7 +227,7 @@ Lighthouse mobile, measured locally on September 26, 2026, right after the Svelt
 - [x] Functional backend API connected to PostgreSQL
 - [x] Passing CI pipeline (lint, type check, build)
 - [x] Working contact form (submission + validation + visual feedback to the user)
-- [ ] Validate `/fountains/:id` (400 on invalid id, 404 when not found, single object instead of an array)
+- [x] Validate `/fountains/:id` (400 on invalid id, 404 when not found, single object instead of an array)
 - [ ] Fix `.env` path resolution in the compiled backend
 - [ ] Dockerfiles + `docker-compose.prod.yml`
 - [ ] Live deployment on the VPS, application accessible online
