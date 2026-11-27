@@ -260,6 +260,12 @@ Lighthouse mobile, measured locally on September 26, 2026, right after the Svelt
 
 - More advanced automated deployment (staging/production)
 
+## AI usage
+
+Up to v0.1.0, I used Claude in **chat mode as a tutor**: explanations, code reviews and step-by-step guidance. I wrote most of the code myself; some snippets come from the chat and were reviewed and integrated by hand.
+
+From v0.1.0 onwards, I am introducing an AI coding agent (Claude Code) into the workflow, to learn how to work with AI beyond chat. Every change is reviewed before being committed.
+
 ## Last update
 
 November 27, 2026
