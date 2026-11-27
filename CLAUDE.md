@@ -36,7 +36,7 @@ What CI runs (`.github/workflows/ci.yml`, three parallel jobs, Node 24); run the
 - `backend/`: `npm run check`, `npm run build`
 - `frontend/`: `npm run lint`, `npm run check` (svelte-check + tsc), `npm run build`
 
-`frontend` build fails if `VITE_API_URL` is unset. There is no test suite yet (Vitest is planned).
+`frontend` build fails if `VITE_API_URL` is unset. There is no automated test suite yet (Vitest is planned). API behavior is covered by a Postman collection in `docs/postman/GLOU.postman_collection.json` (run manually with the Collection Runner, backend running, **Manual** folder excluded since it sends a real email); update it when an endpoint's responses change.
 
 ## Backend architecture (`backend/`)
 

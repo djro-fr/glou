@@ -188,6 +188,7 @@ Filtering is done client-side in the frontend (small dataset). The server-side f
 - Three jobs running in parallel: `db`, `backend`, `frontend`
 - Each job: `npm ci` + lint (ESLint) + type check + build (10-minute timeout per job)
 - Tests: Vitest (planned)
+- API tests: Postman collection (`docs/postman/GLOU.postman_collection.json`), run manually with the Collection Runner (not part of the pipeline)
 - Code quality checked locally in the editor with SonarQube for IDE (not part of the pipeline)
 
 **CD, triggered on push to `main` (to do):**

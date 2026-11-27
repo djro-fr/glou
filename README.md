@@ -163,12 +163,17 @@ _Coming soon, once deployed._
 | `backend/` | `start` | Run the compiled production server |
 | `db/` | `check` | Type-check the seed scripts |
 
+## API tests (Postman)
+
+The API is tested with a Postman collection: [`docs/postman/GLOU.postman_collection.json`](docs/postman/GLOU.postman_collection.json). Requests are grouped by expected status code (200, 400, 404). Each request checks the status code and the response body: the shape of the data, that filters are applied, and the shared error format `{ errors: [{ field, message }] }`. To run it, start the database and the backend (steps 4 to 6 above), import the collection into Postman and run it with the Collection Runner. The `baseUrl` collection variable defaults to `http://localhost:3000`. Leave the **Manual** folder unchecked: its request sends a real email through the contact form.
+
 ## Project structure
 
 ```text
 .
 ├── .github/workflows/ci.yml     # CI: lint, type-check, build (GitHub Actions)
 ├── docs/
+│   ├── postman/                 # Postman collection (API tests)
 │   └── SPECIFICATIONS.md
 ├── db/
 │   ├── data/                    # CSV sources, versioned
