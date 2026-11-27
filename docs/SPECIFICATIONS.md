@@ -52,6 +52,9 @@
 12. **US12, Locate myself**
   As a visitor, I want to see my position on the map, so I can spot the fountains around me.
 
+13. **US13, Splash screen**
+  As a visitor, I want to see the app's identity (logo, name, baseline, version) while it starts, so I know right away which app I'm in and that it is loading.
+
 ---
 
 ## 3. Features, Version 1 (MVP)
@@ -73,6 +76,13 @@
   - When a District or City filter is applied, the map automatically recenters and zooms to the matching area (`fitBounds` on the bounding box of matching fountains)
   - Filters remain combinable with each other (US8)
 - **User geolocation (US12)**: MapLibre `GeolocateControl`, mounted in the filter bar (left of the district dropdown) instead of a map corner. Requires a secure context (HTTPS or localhost).
+- **Splash screen (US13)**, full-screen overlay shown on the first load of the app (not on client-side navigation between pages):
+  - Content: GLOU logo (`public/images/logo-glou-couleur.png`), app name "GLOU Toulouse", baseline (wording to be defined), version number (e.g. "v0.2.0")
+  - Version read from `frontend/package.json` at build time (Vite `define`), never hard-coded, so it always matches the release
+  - Hidden once the fountains are loaded and the map is ready, with a minimum display time so it doesn't just flash, and a maximum one so a slow or failed load never blocks the app (errors still show the usual toast)
+  - Fade-out transition, disabled with `prefers-reduced-motion`
+  - Accessible: logo `alt`, loading state announced to screen readers (`role="status"`); the overlay doesn't trap focus and is removed from the DOM once hidden
+  - Styled with the design tokens (colors, typography); must not noticeably degrade LCP/CLS (see section 9)
 - **Fountain details (US7)**, shown on marker click: ID, type, city, district, location, address, status
 - About page: project presentation (context, objective, tech stack) and short bio
 - Contact page: form (name, email, subject, message) sent via a dedicated backend (Nodemailer)
@@ -252,6 +262,7 @@ Lighthouse mobile, measured locally on September 26, 2026, right after the Svelt
 - [x] Fix `.env` path resolution in the compiled backend
 - [x] Dockerfiles + `docker-compose.prod.yml`
 - [x] Live deployment on the VPS, application accessible online (<https://glou.sylys.dev>)
+- [ ] Splash screen with logo, name, baseline and version number (US13)
 - [ ] Complete README (context, stack, installation, screenshots)
 
 ---
