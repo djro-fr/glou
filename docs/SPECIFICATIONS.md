@@ -161,7 +161,8 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 ### Error handling & validation
 
 - Backend input validation uses Zod (`safeParse`). Validation errors return **400** with a shared format: `{ errors: [{ field, message }] }`. `/fountains` query params use a strict schema: unknown params are rejected.
-- A global Express error-handling middleware logs the full error server-side and returns a generic **500** message in the same format, without exposing internal details. Dedicated PostgreSQL connection resilience handles startup and runtime failures.
+- A global Express error-handling middleware logs the full error server-side and returns a generic **500** message in the same format, without exposing internal details.
+- PostgreSQL connection: the server exits at startup if the database is unreachable (`process.exit(1)`); runtime connection errors are logged, and the affected requests return a generic 500.
 - Frontend: API responses are checked (`response.ok`) before use; loading failures are shown as a toast and logged in the console.
 
 ---
