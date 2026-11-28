@@ -295,7 +295,9 @@
       const control = new MapLibreGeolocate({        
         trackUserLocation: true,                       
         showAccuracyCircle: true,                      
-        fitBoundsOptions: { maxZoom: 16 },             
+        fitBoundsOptions: { maxZoom: 16 },
+        // MapLibre defaults to 6 s, often too short for a first GPS fix right after location is turned on
+        positionOptions: { enableHighAccuracy: false, timeout: 15000 },
       });                                              
       const locaEl = control.onAdd(mapInstance);
       // MapLibre owns this element; locaSlot is empty in the template, so Svelte never manages its children
@@ -313,6 +315,12 @@
           locaButton.disabled = false;
           locaButton.title = locaLabel;
           locaButton.setAttribute('aria-label', locaLabel);
+        }
+        // On a code 2 (e.g. location off in the Android settings), MapLibre keeps waiting in an error state:
+        // a timeout toast follows, and a tap on the orange button turns tracking off instead of retrying.
+        // Stop tracking (trigger() from an error state goes back to OFF) so the next tap starts a new request.
+        if (event.code === 2 && (control._watchState === 'ACTIVE_ERROR' || control._watchState === 'BACKGROUND_ERROR')) {
+          control.trigger();
         }
       });
 
