@@ -33,9 +33,12 @@
 		@notHashed not path /assets/*
 		header @notHashed Cache-Control "no-cache"
 
-		# Files for AI agents (llms.txt convention, ARD manifest): readable cross-origin
-		@agentFiles path /llms.txt /.well-known/ard.json
+		# Files for AI agents (llms.txt convention, ARD manifest): readable cross-origin.
+		# ai-catalog.json is the legacy name of ard.json (still the only one Lighthouse 13.5 reads):
+		# same file, so there is a single manifest to maintain.
+		@agentFiles path /llms.txt /.well-known/ard.json /.well-known/ai-catalog.json
 		header @agentFiles Access-Control-Allow-Origin "*"
+		rewrite /.well-known/ai-catalog.json /.well-known/ard.json
 
 		try_files {path} /index.html
 		file_server

@@ -1,4 +1,9 @@
 {
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "GLOU Toulouse",
+    "documentationUrl": "https://glou.sylys.dev/llms.txt"
+  },
   "entries": [
     {
       "identifier": "urn:air:glou.sylys.dev:api:fountains",
