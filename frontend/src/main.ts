@@ -7,6 +7,8 @@ import App from './App.svelte'
 import { z } from 'zod';
 
 z.config(z.locales.fr());
+// The CSP forbids eval: skip Zod's new Function() probe (JIT parsers), which logs a CSP violation
+z.config({ jitless: true });
 
 setHashRoutingEnabled(false);
 
