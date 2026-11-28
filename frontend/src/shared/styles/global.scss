@@ -7,6 +7,8 @@ button {
   align-items: center;
   border-radius: $rounded-full;
   background-color: $primary-500;
+  // Explicit: the browser default (buttontext) is black in Chrome but blue or white in Safari iOS
+  color: $neutral-800;
   border: none;
   font-family: $family-text;
   font-size: $ft-siz-medium;
@@ -137,6 +139,11 @@ main dialog {
   border-radius: $rounded-md;
   padding: 0;
   box-shadow: $shd-overlay;
+
+  // The panel container takes the focus on open (see FilterPanel.svelte): no ring on it
+  &:focus {
+    outline: none;
+  }
 
   .close-wrapper {
     width: 100%;

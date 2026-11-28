@@ -50,6 +50,9 @@ const count = $derived(fountains.filter((f) => matchesFilters(f)).length);
 
   function openPanel() {
     dialog.showModal();
+    // showModal() focuses the first control (the close button), and Safari then shows its focus ring:
+    // focus the panel itself instead; Tab still reaches the close button
+    dialog.focus();
   }
 
   function closePanel() {
@@ -72,7 +75,7 @@ const count = $derived(fountains.filter((f) => matchesFilters(f)).length);
   <svg aria-hidden="true"><use href="#FilterSVG" /></svg>
   <span>Filtrer</span>
 </button>
-<dialog bind:this={dialog}>
+<dialog bind:this={dialog} tabindex="-1">
   <div class="close-wrapper">
     <button type="button" onclick={closePanel} aria-label="Fermer">
       <svg width="20" height="20" aria-hidden="true">
