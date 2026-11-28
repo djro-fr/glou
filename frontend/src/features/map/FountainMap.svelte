@@ -21,6 +21,14 @@
   import { addToast,LOAD_ERROR_MESSAGE } from "../../shared/components/toasts.svelte.js";
   import { markAppReady, reportProgress } from "../../shared/components/splash";
 
+  // GeolocationPositionError codes: 1 permission denied, 2 position unavailable, 3 timeout.
+  // On Android, the browser permission alone is not enough when location is off in the system settings,
+  // and browsers report it as either 1 or 2. After a code 1, MapLibre disables its button until reload.
+  function geolocateErrorMessage(code: number) {
+    if (code === 3) return 'La localisation prend trop de temps. Réessayez dans un endroit mieux couvert.';
+    return "Impossible d'obtenir votre position. Vérifiez que la localisation est activée dans les paramètres de votre téléphone et autorisée pour ce navigateur, puis rechargez la page.";
+  }
+
   function fountainsToGeoJSON(fountains: Fountain[]) {
     return {
       type: "FeatureCollection" as const,
@@ -293,7 +301,8 @@
       // MapLibre owns this element; locaSlot is empty in the template, so Svelte never manages its children
       // eslint-disable-next-line svelte/no-dom-manipulating
       locaSlot?.appendChild(locaEl);
-      geolocate = control;                             
+      geolocate = control;
+      control.on('error', (event: { code: number }) => addToast(geolocateErrorMessage(event.code), 'error'));
 
       initFountainLayer(
         mapInstance,
