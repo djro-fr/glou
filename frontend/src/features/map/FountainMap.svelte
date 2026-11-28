@@ -23,10 +23,10 @@
 
   // GeolocationPositionError codes: 1 permission denied, 2 position unavailable, 3 timeout.
   // On Android, the browser permission alone is not enough when location is off in the system settings,
-  // and browsers report it as either 1 or 2. After a code 1, MapLibre disables its button until reload.
+  // and browsers report it as either 1 or 2.
   function geolocateErrorMessage(code: number) {
     if (code === 3) return 'La localisation prend trop de temps. Réessayez dans un endroit mieux couvert.';
-    return "Impossible d'obtenir votre position. Vérifiez que la localisation est activée dans les paramètres de votre téléphone et autorisée pour ce navigateur, puis rechargez la page.";
+    return "Impossible d'obtenir votre position. Vérifiez que la localisation est activée dans les paramètres de votre téléphone et autorisée pour ce navigateur, puis réessayez.";
   }
 
   function fountainsToGeoJSON(fountains: Fountain[]) {
@@ -302,7 +302,19 @@
       // eslint-disable-next-line svelte/no-dom-manipulating
       locaSlot?.appendChild(locaEl);
       geolocate = control;
-      control.on('error', (event: { code: number }) => addToast(geolocateErrorMessage(event.code), 'error'));
+      // After a code 1, MapLibre disables its button for good (watch already cleared, state OFF):
+      // re-enable it with its label saved on start, so the user can retry once location is turned on
+      const locaButton = locaEl.querySelector('button');
+      let locaLabel: string | null = null;
+      control.on('trackuserlocationstart', () => (locaLabel = locaButton?.getAttribute('aria-label') ?? null));
+      control.on('error', (event: { code: number }) => {
+        addToast(geolocateErrorMessage(event.code), 'error');
+        if (event.code === 1 && locaButton && locaLabel) {
+          locaButton.disabled = false;
+          locaButton.title = locaLabel;
+          locaButton.setAttribute('aria-label', locaLabel);
+        }
+      });
 
       initFountainLayer(
         mapInstance,
