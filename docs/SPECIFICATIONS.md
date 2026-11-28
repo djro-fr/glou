@@ -77,11 +77,13 @@
   - Filters remain combinable with each other (US8)
 - **User geolocation (US12)**: MapLibre `GeolocateControl`, mounted in the filter bar (left of the district dropdown) instead of a map corner. Requires a secure context (HTTPS or localhost).
 - **Splash screen (US13)**, full-screen overlay shown on the first load of the app (not on client-side navigation between pages):
-  - Content: GLOU logo (`public/images/logo-glou-couleur.png`), app name "GLOU Toulouse", baseline (wording to be defined), version number (e.g. "v0.2.0")
-  - Version read from `frontend/package.json` at build time (Vite `define`), never hard-coded, so it always matches the release
-  - Hidden once the fountains are loaded and the map is ready, with a minimum display time so it doesn't just flash, and a maximum one so a slow or failed load never blocks the app (errors still show the usual toast)
-  - Fade-out transition, disabled with `prefers-reduced-motion`
-  - Accessible: logo `alt`, loading state announced to screen readers (`role="status"`); the overlay doesn't trap focus and is removed from the DOM once hidden
+  - Content: animated GLOU logo (inline SVG: the drop fills with water as the app loads, static when `prefers-reduced-motion` is set), app name "GLOU Toulouse", baseline "Les fontaines d'eau potable près de vous", version number (e.g. "v0.2.0")
+  - Static markup in `index.html`, with its styles (`Splash.scss`) inlined in `<head>` by a Vite plugin, so it paints before the JS bundle on slow networks instead of a white screen
+  - Version read from `frontend/package.json` at build time (injected into `index.html` by the same Vite plugin), never hard-coded, so it always matches the release
+  - Hidden once the map is fully rendered (basemap tiles and fountain pins drawn, MapLibre `idle` event), or right away if the fountains fail to load (errors still show the usual toast); minimum display time 2 s so it doesn't just flash; a 15 s safety net only covers a basemap host that never answers (MapLibre then never fires `load`); the minimum counts from navigation start (the splash is visible from then), the safety net from app start (so a slow JS download doesn't use it up); when the first page is not the map (About, Contact, 404), only the minimum applies
+  - Water level reflects the loading progress by real steps (no global byte progress is available): ~10 % from CSS before the JS runs, 15 % when the app starts, +35 % MapLibre downloaded, +10 % fountains received, +25 % basemap style and first render (`load`), 100 % when the map is fully rendered (or on a page without the map); each step rises smoothly from the current level (Web Animations API)
+  - Once full: shine, then 0.3 s pause and fade-out transition, all disabled with `prefers-reduced-motion`
+  - Accessible: logo `aria-label`, loading state announced to screen readers (`role="status"`); the overlay doesn't trap focus and is removed from the DOM once hidden
   - Styled with the design tokens (colors, typography); must not noticeably degrade LCP/CLS (see section 9)
 - **Fountain details (US7)**, shown on marker click: ID, type, city, district, location, address, status
 - About page: project presentation (context, objective, tech stack) and short bio
@@ -262,7 +264,7 @@ Lighthouse mobile, measured locally on September 26, 2026, right after the Svelt
 - [x] Fix `.env` path resolution in the compiled backend
 - [x] Dockerfiles + `docker-compose.prod.yml`
 - [x] Live deployment on the VPS, application accessible online (<https://glou.sylys.dev>)
-- [ ] Splash screen with logo, name, baseline and version number (US13)
+- [x] Splash screen with logo, name, baseline and version number (US13)
 - [ ] Complete README (context, stack, installation, screenshots)
 
 ---

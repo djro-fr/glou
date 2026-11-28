@@ -4,12 +4,53 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preload" href="/fonts/Ubuntu-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/Ubuntu-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Basemap hosts (style, then tiles/glyphs/sprites): open the connections while the JS downloads -->
+    <link rel="preconnect" href="https://openmaptiles.geo.data.gouv.fr" crossorigin>
+    <link rel="preconnect" href="https://openmaptiles.data.gouv.fr" crossorigin>
     <link rel="stylesheet" href="/fonts/fonts.css" media="print" onload="this.media='all'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GLOU, Fontaines d'eau potable à Toulouse</title>
     <meta name="description" content="Carte interactive des fontaines à boire de Toulouse, à partir des données ouvertes de Toulouse Métropole." />
   </head>
   <body>
+    <!-- Splash screen (US13): static so it shows before the JS bundle; styles from Splash.scss
+         inlined by the Vite splash plugin, removed by src/shared/components/splash.ts -->
+    <div id="splash" class="splash" role="status">
+      <svg class="splash__logo" width="95" height="135" viewBox="0 0 95 135" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo GLOU">
+        <defs>
+          <linearGradient id="glou-degrade" x1="76.0565" y1="120.74" x2="36.4254" y2="15.7499" gradientUnits="userSpaceOnUse">
+            <stop offset="0.302885" stop-color="#03C9D7" />
+            <stop offset="0.5625" stop-color="#07A1CE" />
+            <stop offset="1" stop-color="#1900A9" />
+          </linearGradient>
+          <!-- The waves are masks: white = visible -->
+          <mask id="glou-masque-arriere">
+            <g class="splash__level">
+              <path class="splash__wave splash__wave--back" fill="#fff" d="M0 0 Q12.5 4 25 0 T50 0 T75 0 T100 0 T125 0 T150 0 T175 0 T200 0 V150 H0 Z" />
+            </g>
+          </mask>
+          <mask id="glou-masque-avant">
+            <g class="splash__level">
+              <path class="splash__wave" fill="#fff" d="M0 0 Q12.5 -4 25 0 T50 0 T75 0 T100 0 T125 0 T150 0 T175 0 T200 0 V150 H0 Z" />
+            </g>
+          </mask>
+          <path id="glou-forme" d="M44.6726 0C60.1573 26.0602 80.1038 45.929 90.5773 67.4201C92.67 71.7141 88.3848 75.8882 83.9091 74.2644C72.6132 70.1661 55.6367 64.5449 47.5 64.5449C34.6955 64.5449 24.3155 74.9747 24.3155 87.8405C24.3155 100.706 34.6955 111.136 47.5 111.136C55.2362 111.136 62.0868 107.329 66.2982 101.477C67.1903 100.237 67.8571 99.2042 67.5744 98.352C67.2917 97.4997 66.1526 97.4997 65.0298 97.4997C58.8542 97.4997 54.4732 97.4997 47.5 97.4997C47.5 97.4997 46.369 87.2723 54.8512 85.5678C63.3333 83.8632 90.4762 83.8632 92.7381 83.8632C95 83.8632 95 88.5369 95 91.2496C95 93.9624 94.9504 95.9405 93.8002 100.057C88.1671 120.215 69.6978 135 47.7827 135C21.3931 135 0 113.562 0 87.1164C0 44.9424 28.8393 32.1582 44.6726 0Z" />
+        </defs>
+        <!-- Empty silhouette, back wave, front wave -->
+        <use href="#glou-forme" fill="url(#glou-degrade)" opacity="0.15" />
+        <use href="#glou-forme" fill="#80EBF2" mask="url(#glou-masque-arriere)" />
+        <use href="#glou-forme" fill="url(#glou-degrade)" mask="url(#glou-masque-avant)" />
+        <g class="splash__shine">
+          <path d="M16.4098 60.4693C24.5494 51.1853 37.363 48.5759 47.8186 53.1833C40.1152 52.6654 30.2287 57.5019 22.455 66.3687C15.3753 74.444 11.8165 83.8446 12.3576 91.2096C7.4244 81.5657 8.67342 69.2936 16.4098 60.4693Z" fill="#1EC0E3" />
+          <path d="M72.7877 117.474C68.9327 120.386 63.7989 121.788 58.6991 121.677C57.3788 121.649 57.5241 119.514 58.7921 119.143C62.1712 118.155 65.6242 116.465 68.6856 114.153C72.1114 111.565 74.4865 108.621 75.669 105.809C76.1232 104.729 77.8874 104.456 78.0936 105.61C78.8461 109.823 77.0835 114.229 72.7877 117.474Z" fill="#80EBF2" />
+        </g>
+      </svg>
+      <p class="splash__name">GLOU Toulouse</p>
+      <p class="splash__baseline">Les fontaines d'eau potable près de vous</p>
+      <p class="splash__version">v%APP_VERSION%</p>
+      <span class="splash__loading">Chargement de l'application…</span>
+    </div>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -1,0 +1,140 @@
+@use '../styles/tokens.scss' as *;
+
+// Inlined in index.html by the Vite splash plugin (vite.config.ts), so the splash
+// paints before any JS or CSS bundle: keep it self-contained (no reliance on reset.scss)
+
+// The two weights the splash uses, duplicated from public/fonts/fonts.css: that stylesheet loads
+// deferred at low priority, so without these the preloaded fonts (index.html) would apply late.
+// Same URLs, so the files are downloaded only once.
+@font-face {
+  font-family: 'Ubuntu';
+  src: url('/fonts/Ubuntu-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src: url('/fonts/Ubuntu-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.splash {
+  // Above everything, including the fixed nav bar (z-index 10)
+  z-index: 100;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-lg;
+  background-color: $primary-100;
+  font-family: $family-text, sans-serif;
+  text-align: center;
+  opacity: 1;
+
+  // Set by splash.ts: 0.3 s pause, then fade-out
+  &--hidden {
+    opacity: 0;
+    transition: opacity 0.4s ease 0.3s;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  &__logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: $space-md;
+  }
+
+  // Animated logo: the water level follows the loading progress, waves scroll, then the shine fades in.
+  // Before the JS runs, CSS alone brings the level to ~10 %; splash.ts then takes over (Web Animations API)
+  &__level {
+    animation: splash-fill 1.5s ease-out forwards;
+  }
+
+  &__wave {
+    animation: splash-wave 2s linear infinite;
+
+    &--back {
+      animation-duration: 3s;
+      animation-direction: reverse;
+    }
+  }
+
+  // Shown by splash.ts once the drop is full
+  &__shine {
+    opacity: 0;
+    transition: opacity 0.4s ease-out;
+  }
+
+  &--full &__shine {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &--hidden,
+    &__shine {
+      transition: none;
+    }
+
+    &__level,
+    &__wave {
+      animation: none;
+    }
+
+    &__level {
+      transform: translateY(-6px);
+    }
+
+    &__shine {
+      opacity: 1;
+    }
+  }
+
+  &__name {
+    font-size: $ft-siz-2x-large;
+    font-weight: 700;
+    color: $primary-800;
+  }
+
+  &__baseline {
+    font-size: $ft-siz-medium;
+    font-weight: 400;
+    color: $neutral-700;
+  }
+
+  &__version {
+    margin-top: $space-md;
+    font-size: $ft-siz-x-small;
+    color: $neutral-500;
+  }
+
+  // Announced by screen readers through role="status", not shown
+  &__loading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+// Empty (140px) to ~10 % (125px); full is -6px, see LEVEL_EMPTY / LEVEL_FULL in splash.ts
+@keyframes splash-fill {
+  from { transform: translateY(140px); }
+  to { transform: translateY(125px); }
+}
+
+// One wave period is 50 units: shifting by 100 loops seamlessly
+@keyframes splash-wave {
+  to { transform: translateX(-100px); }
+}
