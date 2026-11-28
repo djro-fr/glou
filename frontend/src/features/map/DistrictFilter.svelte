@@ -21,7 +21,6 @@
   onSelect={(o) => setDistrict(o?.id ?? null)}
   label="Quartier"
   placeholder="Sélectionnez"
-  ariaLabel="Filtrez par quartiers"
   clearLabel="Tous les quartiers"
   loading={districtsState.loading}
   disabled={!isDistrictAvailable(filters.city)}
