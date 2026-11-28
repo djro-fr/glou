@@ -33,6 +33,10 @@
 		@notHashed not path /assets/*
 		header @notHashed Cache-Control "no-cache"
 
+		# Files for AI agents (llms.txt convention, ARD manifest): readable cross-origin
+		@agentFiles path /llms.txt /.well-known/ard.json
+		header @agentFiles Access-Control-Allow-Origin "*"
+
 		try_files {path} /index.html
 		file_server
 	}

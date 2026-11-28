@@ -1,0 +1,32 @@
+{
+  "entries": [
+    {
+      "identifier": "urn:air:glou.sylys.dev:api:fountains",
+      "displayName": "GLOU Toulouse drinking water fountains API",
+      "type": "application/json",
+      "url": "https://glou.sylys.dev/api/fountains",
+      "description": "Read-only JSON API listing the 481 public drinking water fountains of Toulouse Métropole (France), with location, address, city, district, type, status and coordinates. Optional query filters: city, district, type, status. No key required.",
+      "representativeQueries": [
+        "Where is the nearest drinking water fountain in Toulouse?",
+        "List the open drinking water fountains in a Toulouse district",
+        "fontaine d'eau potable Toulouse",
+        "où boire de l'eau gratuitement à Toulouse"
+      ],
+      "capabilities": ["list-fountains", "filter-fountains", "get-fountain", "list-districts"],
+      "tags": ["drinking water", "fountains", "Toulouse", "open data", "map"]
+    },
+    {
+      "identifier": "urn:air:glou.sylys.dev:docs:llms-txt",
+      "displayName": "GLOU Toulouse site overview for LLMs",
+      "type": "text/markdown",
+      "url": "https://glou.sylys.dev/llms.txt",
+      "description": "Markdown overview of the GLOU Toulouse website and its public API, following the llms.txt convention.",
+      "representativeQueries": [
+        "What is GLOU Toulouse?",
+        "How do I get the list of drinking water fountains in Toulouse as JSON?",
+        "carte des fontaines à boire de Toulouse Métropole"
+      ],
+      "tags": ["documentation", "llms.txt"]
+    }
+  ]
+}

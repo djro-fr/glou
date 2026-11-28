@@ -1,0 +1,21 @@
+# GLOU Toulouse
+
+> Interactive map of the 481 public drinking water fountains of Toulouse Métropole (France), built from the official open data. The website is in French; the read-only JSON API below needs no key.
+
+Each fountain has a location, an address, a city, a district (Toulouse only), a type and a status ("Ouverte" when open, "Fermée pour maintenance" when closed for maintenance; some statuses are empty in the source data).
+
+## Website
+
+- [Map](https://glou.sylys.dev/): all fountains on a map, filterable by city, district, type and status
+- [About](https://glou.sylys.dev/about): the project and its author
+
+## API
+
+- [All fountains](https://glou.sylys.dev/api/fountains): JSON array of fountains with `id`, `location_f`, `address_f`, `city`, `type_f`, `status_f`, `latitude`, `longitude`, `district_number` and `name_d` (district name). Optional query filters: `city`, `district` (number), `type`, `status`
+- [One fountain](https://glou.sylys.dev/api/fountains/1): a single fountain by `id`
+- [Districts](https://glou.sylys.dev/api/districts): JSON array of Toulouse districts (`number_d`, `name_d`)
+
+## Sources
+
+- [Open data: Fontaines à boire](https://data.toulouse-metropole.fr/explore/dataset/fontaines-a-boire/): the Toulouse Métropole dataset behind the map
+- [Source code](https://github.com/djro-fr/glou): the project on GitHub
