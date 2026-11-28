@@ -19,6 +19,7 @@
 
   import { untrack } from "svelte";
   import { addToast,LOAD_ERROR_MESSAGE } from "../../shared/components/toasts.svelte.js";
+  import { markAppReady } from "../../shared/components/splashState.svelte.js";
 
   function fountainsToGeoJSON(fountains: Fountain[]) {
     return {
@@ -188,7 +189,7 @@
     fountains: Fountain[],
     onPinClick: (fountain: Fountain) => void,
   ) {
-    loadPinImages(mapInstance).then(() => {
+    return loadPinImages(mapInstance).then(() => {
       addFountainLayers(mapInstance, geojson);
       setupClusterInteractions(mapInstance);
       setupPinInteractions(mapInstance, fountains, onPinClick);
@@ -208,10 +209,12 @@
       onFountainsLoaded(fountains);
       const geojson = fountainsToGeoJSON(fountains);
       await mapLoaded;
-      handleMapLoad(mapInstance, geojson, fountains, onPinClick);
+      await handleMapLoad(mapInstance, geojson, fountains, onPinClick);
     } catch (err) {
       console.error('Chargement des fontaines impossible :', err);
       addToast(LOAD_ERROR_MESSAGE, 'error');
+    } finally {
+      markAppReady();
     }
   }
 

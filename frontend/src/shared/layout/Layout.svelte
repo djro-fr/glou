@@ -6,8 +6,13 @@
   
   import { location } from '@keenmate/svelte-spa-router';
   import ToastContainer from "../components/ToastContainer.svelte";
+  import Splash from "../components/Splash.svelte";
+  import { markAppReady } from "../components/splashState.svelte.js";
 
   let isMapPage = $derived(location() === '/');
+
+  // Only the map page has data to wait for; other first pages just get the minimum splash time
+  if (location() !== '/') markAppReady();
 
 </script>
 
@@ -17,3 +22,4 @@
   <Router {routes} />
 </main>
 <ToastContainer />
+<Splash />
