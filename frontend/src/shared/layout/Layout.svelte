@@ -6,8 +6,7 @@
   
   import { location } from '@keenmate/svelte-spa-router';
   import ToastContainer from "../components/ToastContainer.svelte";
-  import Splash from "../components/Splash.svelte";
-  import { markAppReady } from "../components/splashState.svelte.js";
+  import { markAppReady } from "../components/splash";
 
   let isMapPage = $derived(location() === '/');
 
@@ -22,4 +21,3 @@
   <Router {routes} />
 </main>
 <ToastContainer />
-<Splash />

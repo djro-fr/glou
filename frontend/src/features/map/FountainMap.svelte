@@ -19,7 +19,7 @@
 
   import { untrack } from "svelte";
   import { addToast,LOAD_ERROR_MESSAGE } from "../../shared/components/toasts.svelte.js";
-  import { markAppReady } from "../../shared/components/splashState.svelte.js";
+  import { markAppReady, reportProgress } from "../../shared/components/splash";
 
   function fountainsToGeoJSON(fountains: Fountain[]) {
     return {
@@ -196,20 +196,27 @@
     });
   }
 
+  async function fetchFountains(): Promise<Fountain[]> {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/fountains`);
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+  }
+
   async function initFountainLayer(
     mapInstance: Map,
     mapLoaded: Promise<unknown>,
+    fountainsRequest: Promise<Fountain[]>,
     onFountainsLoaded: (fountains: Fountain[]) => void,
     onPinClick: (fountain: Fountain) => void,
   ) {
     try{
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/fountains`);
-      if (!res.ok) throw new Error(`API error: ${res.status}`);  
-      const fountains: Fountain[] = await res.json();
+      const fountains = await fountainsRequest;
       onFountainsLoaded(fountains);
       const geojson = fountainsToGeoJSON(fountains);
       await mapLoaded;
       await handleMapLoad(mapInstance, geojson, fountains, onPinClick);
+      // Keep the splash until the basemap tiles and pins are actually drawn
+      await mapInstance.once('idle');
     } catch (err) {
       console.error('Chargement des fontaines impossible :', err);
       addToast(LOAD_ERROR_MESSAGE, 'error');
@@ -246,6 +253,11 @@
     let mapInstance: Map | null = null;
     let cancelled = false;
     async function initMap() {
+      // Fetch the fountains while MapLibre downloads instead of after (matters on slow networks)
+      const fountainsRequest = fetchFountains();
+      // Also marks the rejection as handled now; initFountainLayer awaits it and shows the error
+      fountainsRequest.then(() => reportProgress('fountains'), () => {});
+
       const [
         { Map: MapLibreMap, GeolocateControl: MapLibreGeolocate, setWorkerUrl }, 
         workerUrlModule,
@@ -254,6 +266,7 @@
         import("maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url"),
       ]);
       await import("maplibre-gl/dist/maplibre-gl.css");
+      reportProgress('maplibre');
 
       if (cancelled || !mapContainer) return;
 
@@ -269,6 +282,7 @@
       map = mapInstance;
 
       const mapLoaded = mapInstance.once('load');
+      mapLoaded.then(() => reportProgress('mapLoaded'));
 
       const control = new MapLibreGeolocate({        
         trackUserLocation: true,                       
@@ -284,6 +298,7 @@
       initFountainLayer(
         mapInstance,
         mapLoaded,
+        fountainsRequest,
         (loaded) => (fountains = loaded),
         (fountain) => (selectedFountain = fountain),
       );
