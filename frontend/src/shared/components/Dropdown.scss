@@ -8,7 +8,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    color: $primary-700;
+    // $primary-700 is 4.4:1 on white (WCAG AA needs 4.5:1 at this size)
+    color: $primary-800;
     margin-bottom: 0.25rem;
   }
 
@@ -60,7 +61,7 @@
         color: $primary-500;
       }
     }
-    &[aria-expanded="true"] {
+    &--open {
       .dropdown__arrow {
         transform: rotate(180deg);
       }

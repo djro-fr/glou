@@ -37,7 +37,11 @@
     disabled = false,
   }: Props<T> = $props();
 
-  const labelId = `dropdown-label-${Math.random().toString(36).slice(2, 9)}`;  
+  // Unique per instance: several dropdowns share the map page
+  const uid = Math.random().toString(36).slice(2, 9);
+  const labelId = `dropdown-label-${uid}`;
+  const listboxId = `dropdown-listbox-${uid}`;
+  const optionId = (index: number) => `${listboxId}-option-${index}`;
 
   let displayPlaceholder = $derived(placeholder ?? clearLabel);
   let isOpen = $state(false);
@@ -129,21 +133,19 @@
     <span id={labelId} class="dropdown__label">{label}</span>
   {/if}
 
-  <div
-    bind:this={containerRef}
-    class="dropdown"
-    role="combobox"
-    aria-controls="dropdown-listbox"
-    aria-expanded={isOpen}
-    aria-owns="dropdown-listbox"
-  >
+  <div bind:this={containerRef} class="dropdown" class:dropdown--open={isOpen}>
+    <!-- ARIA "select-only combobox": named by the visible label, value = button text -->
     <button
       class="dropdown__button"
       type="button"
+      role="combobox"
       onclick={() => (isOpen = !isOpen)}
       aria-haspopup="listbox"
-      aria-controls="dropdown-listbox"
-      aria-label={ariaLabel}
+      aria-controls={listboxId}
+      aria-expanded={isOpen}
+      aria-labelledby={label ? labelId : undefined}
+      aria-label={label ? undefined : ariaLabel}
+      aria-activedescendant={isOpen && focusedIndex >= 0 ? optionId(focusedIndex) : undefined}
       disabled={disabled || loading || !!error}
     >
       {getDisplayText()}
@@ -160,8 +162,9 @@
     {/if}
 
     {#if isOpen && !loading && !error}
-      <ul id="dropdown-listbox" class="dropdown__menu"  class:dropdown__menu--down={direction === 'down'} role="listbox">
+      <ul id={listboxId} class="dropdown__menu" class:dropdown__menu--down={direction === 'down'} role="listbox" aria-labelledby={label ? labelId : undefined}>
         <li
+          id={optionId(0)}
           class="dropdown__option dropdown__option--clear"
           class:dropdown__option--focused={focusedIndex === 0}
           role="option"
@@ -174,6 +177,7 @@
         </li>
         {#each options as option, index (option.id)}
           <li
+            id={optionId(index + 1)}
             class="dropdown__option"
             class:dropdown__option--focused={focusedIndex === index + 1}
             role="option"
