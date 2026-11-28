@@ -170,6 +170,7 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 - Contact: `POST /contact` route on the Express backend, sent via Nodemailer over SMTP (`secure` derived from the port: 465 vs 587; `transporter.verify()` called at startup)
 - Font: self-hosted Ubuntu (woff2, no external CDN), preloaded and loaded non-render-blocking (`media="print"` swap). The 8 files in `frontend/public/fonts/` are subset to Latin + French (about 70 % smaller, 30-40 KB each), keeping kerning and ligatures. To regenerate from the original Ubuntu fonts (`pip install fonttools brotli`):
   `pyftsubset <font>.woff2 --unicodes="U+0020-007E,U+00A0-00FF,U+0152-0153,U+0178,U+2013-2014,U+2018-201E,U+2026,U+202F,U+20AC" --flavor=woff2 --layout-features='*' --output-file=<font>.woff2`
+- Files for AI agents, static in `frontend/public/` and served with `Access-Control-Allow-Origin: *`: `/llms.txt` (Markdown overview of the site and the API, [llms.txt](https://llmstxt.org/) convention) and `/.well-known/ard.json` (manifest of the API and of `llms.txt`, [Agentic Resource Discovery](https://agenticresourcediscovery.org/spec/) v0.91, the successor of `ai-catalog.json`). Keep them in sync when an endpoint changes.
 
 ### Error handling & validation
 
