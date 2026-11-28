@@ -168,7 +168,8 @@ Queries joining `fountain` and `district` use `LEFT JOIN`, so fountains without 
 - MapLibre GL JS lazy-loaded (dynamic import) to optimize mobile LCP
 - Routing: @keenmate/svelte-spa-router (history mode)
 - Contact: `POST /contact` route on the Express backend, sent via Nodemailer over SMTP (`secure` derived from the port: 465 vs 587; `transporter.verify()` called at startup)
-- Font: self-hosted Ubuntu (woff2, no external CDN), preloaded and loaded non-render-blocking (`media="print"` swap)
+- Font: self-hosted Ubuntu (woff2, no external CDN), preloaded and loaded non-render-blocking (`media="print"` swap). The 8 files in `frontend/public/fonts/` are subset to Latin + French (about 70 % smaller, 30-40 KB each), keeping kerning and ligatures. To regenerate from the original Ubuntu fonts (`pip install fonttools brotli`):
+  `pyftsubset <font>.woff2 --unicodes="U+0020-007E,U+00A0-00FF,U+0152-0153,U+0178,U+2013-2014,U+2018-201E,U+2026,U+202F,U+20AC" --flavor=woff2 --layout-features='*' --output-file=<font>.woff2`
 
 ### Error handling & validation
 
