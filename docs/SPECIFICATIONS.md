@@ -76,6 +76,7 @@
   - When a District or City filter is applied, the map automatically recenters and zooms to the matching area (`fitBounds` on the bounding box of matching fountains)
   - Filters remain combinable with each other (US8)
 - **User geolocation (US12)**: MapLibre `GeolocateControl`, mounted in the filter bar (left of the district dropdown) instead of a map corner. Requires a secure context (HTTPS or localhost).
+  - Errors show a toast: a timeout asks to retry; a denied permission or unavailable position asks to check that location is enabled in the phone settings and allowed for the browser, then reload (on Android, the browser permission alone is not enough when system location is off; a web page cannot turn it on, see V2 ideas).
 - **Splash screen (US13)**, full-screen overlay shown on the first load of the app (not on client-side navigation between pages):
   - Content: animated GLOU logo (inline SVG: the drop fills with water as the app loads, static when `prefers-reduced-motion` is set), app name "GLOU Toulouse", baseline "Les fontaines d'eau potable près de vous", version number (e.g. "v0.2.0")
   - Static markup in `index.html`, with its styles (`Splash.scss`) inlined in `<head>` by a Vite plugin, so it paints before the JS bundle on slow networks instead of a white screen
@@ -292,6 +293,7 @@ Lighthouse mobile, measured locally on September 26, 2026, right after the Svelt
 ### Medium priority
 
 - **Fountain photos**: add square photo storage and display in the fountain details panel
+- **Android app (Trusted Web Activity)**: wrap the site in a Play Store app so it can show the native "Turn on location" system dialog (Google Play Services `SettingsClient`, as Waze does) when location is off in the system settings; not possible from a web page. Requires a Google Play developer account and an Android project to maintain.
 
 ### Lower priority
 
